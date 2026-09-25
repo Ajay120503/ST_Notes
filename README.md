@@ -30,12 +30,36 @@ Before testing anything, you need to describe *what* you're testing as a system,
 
 **Functional decomposition** (e.g., a Hospital Management System splitting into IPD, OPD, Casualty sub-systems, each with its own modules like Admission, Ward allocation, Billing) is the standard first step in scoping a test effort — it tells you how many independent test charters/modules exist before you write a single test case.
 
+```mermaid
+flowchart TD
+    HMS[Hospital Management System] --> IPD[In-Patient Dept]
+    HMS --> OPD[Out-Patient Dept]
+    HMS --> CAS[Casualty Dept]
+    IPD --> IPD1[Admission Procedure]
+    IPD --> IPD2[Ward / Bed Decision]
+    IPD --> IPD3[Medicine & Pathology Records]
+    OPD --> OPD1[Registration Process]
+    OPD --> OPD2[Doctor's Duty Chart]
+    OPD --> OPD3[Medicine Shop]
+    CAS --> CAS1[Accident / Emergency Case]
+    CAS --> CAS2[Police Verification]
+    CAS --> CAS3[Ambulance & Mortuary Details]
+```
+
 ### 2. SDLC — Software Development Life Cycle
 **Definition:** A conceptual framework of ordered phases (Requirements → Design → Coding → Testing → Deployment → Maintenance) that a software product moves through from conception to retirement.
 
 **Why testers care about SDLC model choice:** the model dictates *when* testing happens, *how much* re-testing is needed, and *how the STLC maps onto it*.
 
 #### Waterfall Model
+```mermaid
+flowchart TD
+    A[Requirements] --> B[System Design]
+    B --> C[Implementation / Coding]
+    C --> D[Testing]
+    D --> E[Deployment]
+    E --> F[Maintenance]
+```
 - Proposed by **Winston W. Royce**; strictly sequential, each phase must complete before the next starts.
 - **Fits when:** requirements are stable, project is short, technology is mature.
 - **Testing implication:** testing is a single late phase → defects found late are the most expensive to fix (cost-of-defect curve grows exponentially by phase).
@@ -118,6 +142,15 @@ A **systematic, planned process of executing a program/system with the intent of
 ### 8. Software Testing Life Cycle (STLC)
 STLC is the *execution-side* counterpart to SDLC — it is a systematic, sequenced set of six phases dedicated purely to testing.
 
+```mermaid
+flowchart LR
+    A[1. Requirement Analysis] --> B[2. Test Planning]
+    B --> C[3. Test Case Development]
+    C --> D[4. Environment Setup]
+    D --> E[5. Test Execution]
+    E --> F[6. Test Cycle Closure]
+```
+
 | Phase | Key Activities | Typical Deliverable |
 |---|---|---|
 | **1. Requirement Analysis** | Identify test environment, testable requirements, test types needed, testing priorities | Requirement Traceability Matrix (RTM) input, testability report |
@@ -153,6 +186,23 @@ Purpose: feed information back into the development process and make the product
 
 ### 11. Defect / Bug Life Cycle (states)
 
+```mermaid
+stateDiagram-v2
+    [*] --> New
+    New --> Assigned
+    New --> Rejected
+    New --> Deferred
+    Assigned --> Active
+    Active --> Test
+    Test --> Verified
+    Test --> Reopened
+    Reopened --> Active
+    Verified --> Closed
+    Rejected --> [*]
+    Deferred --> [*]
+    Closed --> [*]
+```
+
 | State | Meaning |
 |---|---|
 | **New** | Defect logged, not yet validated |
@@ -175,19 +225,29 @@ Purpose: feed information back into the development process and make the product
 ## Unit II — Types of Testing
 
 ### 1. The Classification Tree
-```
-                         Testing
-                    /             \
-          Manual Testing      Automation Testing
-                    |
-   ┌───────┬────────┴─────────┐
-White Box  Black Box       Gray Box
-    \_________________________/
-                |
-        ┌───────┴────────┐
-   Functional        Non-Functional
-   (Unit, Integration,  (Performance, Usability,
-    System, Acceptance)  Compatibility → Load/Stress/Stability)
+```mermaid
+flowchart TD
+    T[Testing] --> M[Manual Testing]
+    T --> A[Automation Testing]
+    M --> WB[White Box]
+    M --> BB[Black Box]
+    M --> GB[Gray Box]
+    WB --> F[Functional Testing]
+    BB --> F
+    GB --> F
+    WB --> NF[Non-Functional Testing]
+    BB --> NF
+    GB --> NF
+    F --> U[Unit Testing]
+    F --> I[Integration Testing]
+    F --> S[System Testing]
+    F --> AC[Acceptance Testing]
+    NF --> P[Performance Testing]
+    NF --> US[Usability Testing]
+    NF --> C[Compatibility Testing]
+    P --> L[Load Testing]
+    P --> ST[Stress Testing]
+    P --> SB[Stability Testing]
 ```
 
 ### 2. Manual vs. Automation — Deep Comparison
@@ -240,6 +300,19 @@ Representative tools: **Manual** — Testpad (checklist-based test planning). **
   - **Bottom-up** — start from lower-level modules, use **drivers** to simulate not-yet-integrated higher modules.
   - **Big-Bang** *(standard technical addition)* — integrate all modules simultaneously and test as one; fast but hard to isolate the source of a failure.
   - **Sandwich/Hybrid** *(standard technical addition)* — combines top-down and bottom-up to meet in the middle, balancing early testability against isolation of failures.
+
+```mermaid
+flowchart TD
+    subgraph "Top-Down (uses Stubs for lower modules)"
+    M1[Module 1] --> M2[Module 2]
+    M1 --> M3[Module 3]
+    end
+    subgraph "Bottom-Up (uses Drivers for upper modules)"
+    M4[Module 4] --> M2b[Module 2]
+    M5[Module 5] --> M2b
+    M6[Module 6] --> M3b[Module 3]
+    end
+```
 - ✅ Efficient for smaller systems, surfaces interface defects early; ❌ can delay the overall schedule, risk of missing an interface if too many modules are combined at once.
 
 **System Testing**
@@ -379,6 +452,33 @@ Every technique can be described along five axes: **Testers** (who applies it), 
 
 ### 3. Static vs. Dynamic Testing
 
+```mermaid
+flowchart TD
+    T[Software Testing Techniques] --> S[Static Testing]
+    T --> D[Dynamic Testing]
+    S --> R[Reviews]
+    S --> SA[Static Analysis]
+    R --> R1[Informal Review]
+    R --> R2[Walkthrough]
+    R --> R3[Technical Review]
+    R --> R4[Inspection]
+    SA --> SA1[Control Flow Analysis]
+    SA --> SA2[Data Flow Analysis]
+    D --> ST[Structure-based / White-box]
+    D --> SP[Specification-based / Black-box]
+    D --> EX[Experience-based]
+    ST --> ST1[Statement Coverage]
+    ST --> ST2[Branch / Decision Coverage]
+    ST --> ST3[Condition Coverage]
+    SP --> SP1[Boundary Value Analysis]
+    SP --> SP2[Equivalence Partitioning]
+    SP --> SP3[Decision Table Testing]
+    SP --> SP4[State Transition Testing]
+    SP --> SP5[Use Case Testing]
+    EX --> EX1[Error Guessing]
+    EX --> EX2[Exploratory Testing]
+```
+
 | | **Static Testing** | **Dynamic Testing** |
 |---|---|---|
 | Code execution | Not executed | Executed |
@@ -451,6 +551,17 @@ Each column becomes one test case — this guarantees every meaningful *combinat
 **Rationale:** used when the system's behaviour for a given input **depends on its current state** (history matters).
 
 **Worked example** — ATM PIN entry:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> PINEntry : Insert Card
+    PINEntry --> Authenticated : Correct PIN
+    PINEntry --> PINEntry : Wrong PIN (attempts < 3)
+    PINEntry --> CardBlocked : Wrong PIN (3rd attempt)
+    Authenticated --> [*] : Transaction Complete
+    CardBlocked --> [*]
+```
 - States: `Idle → PIN Entry → (Valid → Authenticated)` or `(Invalid, attempts < 3 → PIN Entry again)` or `(Invalid, attempts = 3 → Card Blocked)`.
 - Test cases are derived to cover **every valid transition** (e.g., Idle→PIN Entry→Authenticated) and **every invalid transition** (e.g., 3 consecutive wrong PINs → Card Blocked), because a purely input-based technique like EP would miss the "3rd wrong attempt" behaviour entirely.
 
@@ -518,7 +629,13 @@ Representative tools: Selenium, QTP; **Intruder** (vulnerability scanner, 10,000
 
 **Stakeholder ecosystem:** Patient/Consumer, Hospital, Insurance Company, Healthcare & life-science solution vendors, and Regulatory Authorities enforcing standards such as **HIPAA** (patient data privacy, US), **OASIS**, and **HCFA-1500** (standard healthcare claim form).
 
-**Process flow:** Patient Registration → Scheduling → Treatment → Billing.
+**Process flow:**
+```mermaid
+flowchart LR
+    A[Patient Registration] --> B[Scheduling]
+    B --> C[Treatment]
+    C --> D[Billing]
+```
 
 | Sub-system | Testing focus |
 |---|---|
