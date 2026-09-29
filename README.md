@@ -1,1051 +1,726 @@
-# Software Testing: Exam Preparation Notes (Units I–V)
+# Software Testing — Exam Preparation Notes
 
-> **Scope:** Fundamentals · Types of Testing · Test Case Development · Testing Techniques · Domain Testing
-> **Terminology basis:** ISTQB Foundation Syllabus, ISO/IEC/IEEE 29119, IEEE 829 (test documentation).
-> **How to read this:** Each unit ends with *Exam Focus* (likely questions). Callouts used throughout:
-> **Exam tip**: how examiners phrase or grade it · **Common confusion**: pairs students mix up · **Added**: standard content missing from the course slides.
+> Consolidated, technically expanded notes covering Units I–V (Fundamentals, Types of Testing, Test Case Development, Testing Techniques, Domain Testing). Concepts from the course slides have been reorganized, corrected, and deepened with standard ISTQB/industry terminology so they hold up under viva/theory questioning, not just recall.
 
 ---
 
 ## Table of Contents
-
-1. [Unit I: Software Testing Fundamentals](#unit-i--software-testing-fundamentals)
-2. [Unit II: Types of Testing](#unit-ii--types-of-testing)
-3. [Unit III: Test Case Development](#unit-iii--test-case-development)
-4. [Unit IV: Testing Techniques](#unit-iv--testing-techniques)
-5. [Unit V: Testing Different Domains](#unit-v--testing-different-domains)
-6. [Quick Revision Sheet](#quick-revision-sheet)
-7. [Master Comparison Table](#master-comparison-table)
+1. [Unit I — Software Testing Fundamentals](#unit-i--software-testing-fundamentals)
+2. [Unit II — Types of Testing](#unit-ii--types-of-testing)
+3. [Unit III — Test Case Development](#unit-iii--test-case-development)
+4. [Unit IV — Testing Techniques](#unit-iv--testing-techniques)
+5. [Unit V — Testing Different Domains](#unit-v--testing-different-domains)
+6. [Quick Revision — Short Notes](#quick-revision--short-notes)
 
 ---
 
-## Unit I: Software Testing Fundamentals
+## Unit I — Software Testing Fundamentals
 
-### 1.1 System Vocabulary
-
-Testers must describe *what* is under test before deciding *how* to test it. This vocabulary defines scope, interfaces and stakeholders.
+### 1. System-Level Vocabulary (why testers need it)
+Before testing anything, you need to describe *what* you're testing as a system, because test scope and stakeholders fall out of this vocabulary.
 
 | Term | Meaning | Testing relevance |
 |---|---|---|
-| **System** | Organized set of interacting components working toward a common goal | Defines total test scope |
-| **Sub-system / Module** | A functional unit obtained by decomposing a system | Basis for unit-test boundaries |
-| **Environment** | Everything outside the system that supplies inputs or consumes outputs | Basis for environment and compatibility testing |
-| **Boundary** | Interface separating system from environment | Source of boundary-value test inputs |
-| **Feedback** | Information about system behaviour returned to the process | Drives defect-reporting loops |
-| **Organization** | People working toward a shared goal | Source of stakeholders for acceptance testing |
+| **System** | An orderly group of interacting components working toward a common goal | Defines total scope of "the software" |
+| **Sub-system / Module** | A system decomposed into smaller functional units | Basis for **Unit Testing** boundaries |
+| **Environment** | Everything outside the system that supplies input or consumes output (excludes raw material & finished product) | Basis for **environment/compatibility testing** |
+| **Boundary** | The limit separating system from environment | Source of **Boundary Value Analysis** inputs |
+| **Feedback** | Information returned about system behaviour | Drives **defect reporting** loops |
+| **Organization** | A rational group of people working toward a shared goal | Source of **stakeholders** for acceptance testing |
 
-**Functional decomposition** (breaking a system into sub-systems, then modules) is the first step in scoping a test effort: it tells you how many independent test areas exist before any test case is written.
+**Functional decomposition** (e.g., a Hospital Management System splitting into IPD, OPD, Casualty sub-systems, each with its own modules like Admission, Ward allocation, Billing) is the standard first step in scoping a test effort — it tells you how many independent test charters/modules exist before you write a single test case.
 
 ```mermaid
 flowchart TD
-    HMS["Hospital Management System"] --> IPD["In-Patient Dept (IPD)"]
-    HMS --> OPD["Out-Patient Dept (OPD)"]
-    HMS --> CAS["Casualty Dept"]
-    IPD --> IPD1["Admission procedure"]
-    IPD --> IPD2["Ward / bed allocation"]
-    IPD --> IPD3["Medicine & pathology records"]
-    OPD --> OPD1["Registration"]
-    OPD --> OPD2["Doctor duty chart"]
-    OPD --> OPD3["Pharmacy"]
-    CAS --> CAS1["Accident / emergency case"]
-    CAS --> CAS2["Police verification"]
-    CAS --> CAS3["Ambulance & mortuary"]
+    HMS[Hospital Management System] --> IPD[In-Patient Dept]
+    HMS --> OPD[Out-Patient Dept]
+    HMS --> CAS[Casualty Dept]
+    IPD --> IPD1[Admission Procedure]
+    IPD --> IPD2[Ward / Bed Decision]
+    IPD --> IPD3[Medicine & Pathology Records]
+    OPD --> OPD1[Registration Process]
+    OPD --> OPD2[Doctor's Duty Chart]
+    OPD --> OPD3[Medicine Shop]
+    CAS --> CAS1[Accident / Emergency Case]
+    CAS --> CAS2[Police Verification]
+    CAS --> CAS3[Ambulance & Mortuary Details]
 ```
 
-**Stakeholder mapping (common exam question):**
+### 2. SDLC — Software Development Life Cycle
+**Definition:** A conceptual framework of ordered phases (Requirements → Design → Coding → Testing → Deployment → Maintenance) that a software product moves through from conception to retirement.
 
-| System | Stakeholders |
+**Why testers care about SDLC model choice:** the model dictates *when* testing happens, *how much* re-testing is needed, and *how the STLC maps onto it*.
+
+#### Waterfall Model
+```mermaid
+flowchart TD
+    A[Requirements] --> B[System Design]
+    B --> C[Implementation / Coding]
+    C --> D[Testing]
+    D --> E[Deployment]
+    E --> F[Maintenance]
+```
+- Proposed by **Winston W. Royce**; strictly sequential, each phase must complete before the next starts.
+- **Fits when:** requirements are stable, project is short, technology is mature.
+- **Testing implication:** testing is a single late phase → defects found late are the most expensive to fix (cost-of-defect curve grows exponentially by phase).
+- ✅ Simple to manage, predictable cost/timeline, easy progress tracking.
+- ❌ No room for changing requirements; risk discovered too late; poor for large/complex/evolving projects.
+
+#### Prototyping Model
+- Builds a working mock-up early, refines it with customer feedback before committing to full development.
+- **Fits when:** requirements are unclear or expected to change; a novel system with an uncertain UI.
+- ✅ Reduces requirement-misunderstanding risk, surfaces defects early, supports early user validation.
+- ❌ Expensive tooling, heavy customer time commitment, risk of the prototype itself being mistaken for the final product.
+
+#### Incremental Model
+- Combines waterfall discipline with prototype-style iteration: build → test → deliver a working *slice* of functionality repeatedly, each increment adding features (planning → analysis → design → construction → deployment, repeated per increment).
+- **Fits when:** requirements are large but can be prioritized, teams are still building skill, customer wants early releases.
+- ✅ Time-to-market is faster, feedback loop is continuous; ❌ overall architecture can fragment across versions if not managed.
+
+#### Agile Model
+- Agile Manifesto (2001) codified a family of iterative methods that predate it: **Rational Unified Process (1994), Scrum (1995), Extreme Programming (1996), DSDM (1995), Feature-Driven Development, Adaptive Software Development**.
+- Core testing implication: testing is **continuous and embedded in every sprint**, not a terminal phase — this is what makes practices like **TDD** and **CI/CD pipelines with automated regression suites** possible (see Unit IV).
+- Values: working software over documentation, responding to change over following a plan, frequent delivery, minimal upfront planning.
+
+#### Object-Oriented SDLC (OOSDLC)
+- Maps requirements to **objects and their interactions (actors ≈ objects)**, cycling through OO analysis → OO design → OO programming → testing (including usability/QA and user-satisfaction checks).
+- ✅ Improves reusability, consistency between analysis/design/code, and communication across roles because the same object model is reused end-to-end.
+
+> **Verification vs. Validation (a commonly tested distinction the slides skip):**
+> - **Verification** = "Are we building the product *right*?" — static checks against specifications (reviews, walkthroughs, inspections) done *without* executing code.
+> - **Validation** = "Are we building the *right* product?" — dynamic checks by executing the software against actual user needs.
+> Both together form the quality-assurance backbone of the STLC below.
+
+### 3. What Is Software Testing?
+A **systematic, planned process of executing a program/system with the intent of finding defects**, and of evaluating whether the system satisfies specified requirements and is fit for purpose. Testing is composed of both **static** activities (review-based, no execution) and **dynamic** activities (execution-based).
+
+**Purpose:** identify gaps between specified and actual behaviour; evaluate features against user needs; detect factors that could cause system failure before release.
+
+**Why testing is non-trivial:** growing diversity of OS, languages, and hardware platforms means the *input space* and *environment space* both explode — no single test run can cover them exhaustively (this becomes **Principle 2** below).
+
+### 4. Manual vs. Automation Testing (first pass — expanded in Unit II)
+
+| Aspect | Manual Testing | Automation Testing |
+|---|---|---|
+| Execution | By a human tester, no tool | By scripts/tools (Selenium, QTP/UFT, LoadRunner, Kobiton) |
+| Best for | Exploratory, usability, one-off/new-feature testing | Repetitive regression, load, cross-browser testing |
+| Initial cost | Low | High (tooling + scripting effort) |
+| Long-run cost | High (repeated manual effort) | Low (script reused every cycle) |
+| Reliability for repetition | Low (fatigue, inconsistency) | High |
+
+### 5. Testing Roles in an Organization
+
+| Role | Core responsibility |
 |---|---|
-| Payroll System | Employees, accountant, cashier, registrar, principal, income-tax personnel |
-| Railway Reservation System | Passenger, train conductor, ticket-counter clerk, government/railway authority |
-| Hospital Management System | Patients, doctors, nurses, ward staff, police, technicians, support staff |
+| **Test Lead / Test Manager** | Leads the testing team; owns the testing process/discipline |
+| **Test Architect** | Designs the overall test architecture, estimates, reusable test assets for complex projects |
+| **Test Designer / Tester** | Designs test cases, executes tests, logs defects, measures coverage |
+| **Test Automation Engineer** | Builds and maintains automated test scripts/infrastructure |
+| **Test Methodologist** | Owns test strategy, frameworks, templates, continuous process improvement |
+| **Software Tester** | Executes prescribed tests pre-implementation for quality, integrity, functionality; finds defects early |
 
----
-
-### 1.2 SDLC and Process Models
-
-**SDLC (Software Development Life Cycle)** is a framework of ordered phases: Requirements → Design → Coding → Testing → Deployment → Maintenance. The **model** chosen decides *when* testing happens, how much re-testing is needed, and how the STLC maps onto development.
-
-#### Waterfall
-```mermaid
-flowchart LR
-    A["Requirements"] --> B["Design"] --> C["Implementation"] --> D["Testing"] --> E["Deployment"] --> F["Maintenance"]
-```
-- Strictly sequential; a phase starts only when the previous one is complete. Associated with Winston Royce's 1970 paper (which itself described the flaws of a purely sequential flow).
-- **Testing implication:** testing is a single late phase, so defects are found late, when they are costliest to fix. (Boehm's cost-of-change curve shows fix cost rising steeply by phase; the exact multiplier is debated, the trend is not.)
-- **Fits:** stable requirements, short projects, mature technology.
-- **Pros:** simple, predictable, easy to track. **Cons:** no room for change; risk surfaces late; poor for large, evolving systems.
-
-#### V-Model *(Added: the model that formalizes test levels)*
-Every development phase has a matching test level planned **in parallel**, so test design starts as soon as each specification exists.
-
-```mermaid
-flowchart LR
-    BR["Business requirements"] --> SR["System requirements (SRS)"] --> HL["High-level design"] --> LL["Low-level design"] --> CD["Coding"]
-    CD --> UT["Unit testing"] --> IT["Integration testing"] --> ST["System testing"] --> AT["Acceptance testing"]
-    LL -. "verified by" .-> UT
-    HL -. "verified by" .-> IT
-    SR -. "verified by" .-> ST
-    BR -. "validated by" .-> AT
-```
-
-| Development phase | Matching test level | Test basis |
-|---|---|---|
-| Business requirements (BRS) | Acceptance testing | Business/user needs |
-| System requirements (SRS) | System testing | Functional + non-functional spec |
-| High-level design (architecture) | Integration testing | Module interfaces |
-| Low-level design | Unit testing | Module logic |
-
-#### Prototyping
-- Builds a working mock-up early and refines it with customer feedback before full development.
-- **Fits:** unclear or volatile requirements; novel UI. **Pros:** cuts requirement-misunderstanding risk, early user validation. **Cons:** costly, heavy customer involvement, risk of a throwaway prototype being shipped as the product.
-
-#### Incremental
-- The system is built and delivered in working slices; each increment runs its own analysis → design → code → test cycle.
-- **Fits:** large but prioritizable scope; early releases wanted. **Pros:** faster time-to-market, continuous feedback. **Cons:** architecture can fragment across increments if unmanaged; every increment needs regression testing.
-
-#### Agile
-- Codified by the **Agile Manifesto (2001)**; roots include Scrum (1995), Extreme Programming (1996), DSDM (1994), Feature-Driven Development and Adaptive Software Development.
-- Values: working software over comprehensive documentation; responding to change over following a plan; customer collaboration; individuals and interactions.
-- **Testing implication:** testing is continuous and embedded in every sprint (whole-team quality), enabling TDD and CI/CD with automated regression (see Unit IV §4.13).
-
-#### Object-Oriented SDLC
-- Requirements are mapped to objects and their interactions; cycle is OO analysis → OO design → OO programming → testing. The same object model is reused end to end, improving reuse and traceability.
-
-| Model | Testing happens | Change tolerance | Best for |
-|---|---|---|---|
-| Waterfall | Late, single phase | Very low | Stable, small projects |
-| V-Model | Planned early, executed late | Low | Safety/regulated projects needing traceability |
-| Prototype | Early on prototype, later on product | High | Unclear requirements |
-| Incremental | Per increment | Medium | Large, prioritizable scope |
-| Agile | Continuous, every sprint | Very high | Evolving requirements, frequent releases |
-
----
-
-### 1.3 What Is Software Testing?
-
-**Definition:** a planned process of evaluating a work product, by **static** activities (reviews, analysis, no execution) and **dynamic** activities (execution), to find defects and to judge whether it satisfies specified requirements and is fit for purpose.
-
-**Why it is hard:** the input space, state space and environment space (OS × browser × device × configuration) explode combinatorially, so exhaustive testing is impossible (Principle 2).
-
-| Term | Meaning | Focus |
-|---|---|---|
-| **Testing** | Finding defects and evaluating quality | Detection |
-| **Debugging** | Locating the cause of a defect and fixing it (developer activity) | Correction |
-| **QA (Quality Assurance)** | Process-oriented, preventive activities that build quality into the process | Prevention |
-| **QC (Quality Control)** | Product-oriented activities (testing is one) that check the product | Detection |
-
-> **Common confusion:** *Testing ≠ debugging.* Testing exposes the failure; debugging finds and removes the cause.
-
-### 1.4 Verification vs. Validation
-
-| | **Verification** | **Validation** |
-|---|---|---|
-| Question | "Are we building the product **right**?" | "Are we building the **right** product?" |
-| Checks against | Specifications and standards | Actual user/business needs |
-| Method | Static: reviews, walkthroughs, inspections, static analysis | Dynamic: executing the software |
-| Timing | Throughout development, before execution is possible | After executable software exists |
-| Examples | SRS review, code inspection | System test, UAT |
-
-### 1.5 Goals of Software Testing
+### 6. Goals of Software Testing
 
 | Horizon | Goals |
 |---|---|
 | **Immediate** | Bug discovery, bug prevention |
 | **Long-term** | Reliability, product quality, customer satisfaction, risk management |
-| **Post-implementation** | Lower maintenance cost, improved future test process |
+| **Post-implementation** | Reduced maintenance cost, improved future testing process |
 
-Post-release defects cost more (production patching, hot-fix pipelines, reputational damage), which is the economic case for **shift-left** testing: test earlier.
+> Key insight: **post-release defects cost far more to fix** than pre-release ones (they require patching in production, hot-fix pipelines, and damage customer trust) — this is the economic argument for "shift-left" testing (test early).
 
-### 1.6 Seven Testing Principles (ISTQB)
+### 7. Seven Principles of Software Testing (ISTQB-aligned)
 
-| # | Principle | Practical implication |
-|---|---|---|
-| 1 | **Testing shows the presence of defects, not their absence** | Passing tests lower risk but never prove zero defects |
-| 2 | **Exhaustive testing is impossible** | Use risk and priority to choose tests; use EP/BVA to shrink the input space |
-| 3 | **Early testing saves time and money** | Review requirements and design (static testing) before code exists |
-| 4 | **Defect clustering** | A few modules hold most defects (roughly the Pareto 80/20 pattern, an empirical tendency, not a law); focus effort there |
-| 5 | **Pesticide paradox** | Repeating identical tests stops finding new bugs; review and refresh test cases regularly |
-| 6 | **Testing is context-dependent** | Safety-critical medical software and a marketing site need different rigor and techniques |
-| 7 | **Absence-of-errors fallacy** | A defect-free system built to the wrong requirements is still a failure |
+1. **Testing shows presence of defects, not their absence.** Passing tests reduce risk; they never *prove* zero defects remain.
+2. **Exhaustive testing is impossible.** Except for trivial cases, the input/state combinatorics are too large — testing must be risk- and priority-based instead.
+3. **Early testing saves time and money.** Defects caught during requirements/design are orders of magnitude cheaper to fix than those caught post-release ("shift-left" testing).
+4. **Defect clustering.** A small number of modules usually contain most of the defects (empirically follows the **Pareto Principle — 80/20 rule**: ~80% of defects come from ~20% of modules).
+5. **Pesticide paradox.** Repeating the *same* tests eventually stops finding new bugs (like pests developing resistance to a pesticide) — test cases must be periodically reviewed and revised to stay effective.
+6. **Testing is context-dependent.** A safety-critical medical system is tested differently from a marketing website — techniques, rigor and depth vary by domain.
+7. **Absence-of-errors is a fallacy.** A bug-free product built against the *wrong* requirements is still a failed product — testing must validate against real user/business needs, not just internal consistency.
 
-### 1.7 Software Testing Life Cycle (STLC)
-
-The STLC is the testing-specific counterpart of SDLC: six sequenced phases, each with **entry criteria** (what must be true to start) and **exit criteria** (what must be true to finish).
+### 8. Software Testing Life Cycle (STLC)
+STLC is the *execution-side* counterpart to SDLC — it is a systematic, sequenced set of six phases dedicated purely to testing.
 
 ```mermaid
 flowchart LR
-    A["1. Requirement analysis"] --> B["2. Test planning"] --> C["3. Test case development"] --> D["4. Environment setup"] --> E["5. Test execution"] --> F["6. Test cycle closure"]
+    A[1. Requirement Analysis] --> B[2. Test Planning]
+    B --> C[3. Test Case Development]
+    C --> D[4. Environment Setup]
+    D --> E[5. Test Execution]
+    E --> F[6. Test Cycle Closure]
 ```
 
-| Phase | Key activities | Entry criteria | Exit criteria / deliverables |
-|---|---|---|---|
-| **1. Requirement Analysis** | Study requirements for testability; identify test types and priorities; identify environment needs | Approved BRS/SRS available | Testable-requirement list, RTM draft, automation feasibility |
-| **2. Test Planning** | Strategy, effort estimate, tool selection, roles, risks, schedule | Requirement analysis done | **Test Plan** approved |
-| **3. Test Case Development** | Design and write test cases/scripts; prepare test data; review | Test plan approved | Reviewed test cases and test data |
-| **4. Environment Setup** | Configure hardware/software; deploy build; run **smoke test** | Test plan and build available | Environment ready + smoke test passed |
-| **5. Test Execution** | Run tests, log results, raise defects, retest fixes, update RTM | Ready environment, baselined test cases | Execution logs, defect reports |
-| **6. Test Cycle Closure** | Check completion criteria (coverage, defect trend, time, cost); metrics; lessons learned | Execution complete | **Test Closure Report** |
-
-> **Common confusion:** SDLC governs the whole product life; STLC governs only testing activities and runs alongside or nested within SDLC (in Agile, a mini-STLC per sprint).
-
-### 1.8 Roles in a Test Organization
-
-| Role | Responsibility |
-|---|---|
-| **Test Manager / Lead** | Owns test process, planning, staffing, reporting |
-| **Test Architect** | Designs test architecture, frameworks, reusable assets for complex projects |
-| **Test Designer / Analyst** | Derives test conditions and cases; measures coverage |
-| **Tester** | Executes tests, logs defects, retests fixes |
-| **Test Automation Engineer** | Builds and maintains automation scripts and infrastructure |
-| **Test Methodologist / Process Owner** | Owns strategy, templates, process improvement |
-
-### 1.9 Error, Defect, Failure
-
-```mermaid
-flowchart LR
-    E["Error / mistake (human action)"] --> D["Defect / bug / fault (flaw in artifact)"] --> F["Failure (observable wrong behaviour)"]
-```
-
-| Term | Definition | Example |
+| Phase | Key Activities | Typical Deliverable |
 |---|---|---|
-| **Error (mistake)** | Human action producing an incorrect result | Developer misreads the spec |
-| **Defect (bug, fault)** | Flaw in a work product caused by an error | `if (age > 18)` where spec says `>= 18` |
-| **Failure** | Deviation from expected behaviour observed when the defect executes | 18-year-old is rejected at run time |
+| **1. Requirement Analysis** | Identify test environment, testable requirements, test types needed, testing priorities | Requirement Traceability Matrix (RTM) input, testability report |
+| **2. Test Planning** | Choose test strategy, estimate effort, select tools, allocate roles/responsibilities, plan training | Test Plan document |
+| **3. Test Case Development** | Write test cases/scripts, prepare test data | Test Case document, test data sets |
+| **4. Environment Setup** | Configure hardware/software for the test environment, perform smoke/build-verification test | Environment ready + smoke-test sign-off |
+| **5. Test Execution** | Execute tests per plan, log results, raise defects, map defects back to test cases in the RTM, retest fixes | Execution logs, defect reports |
+| **6. Test Cycle Closure** | Evaluate completion criteria (coverage, time, cost, quality), produce closure/metrics report, capture lessons learned | Test Closure Report |
 
-Not every defect causes a failure (e.g., dead code, or a path never triggered). The **root cause** is the earliest error or process gap that led to the defect.
+> **SDLC vs. STLC (frequently asked distinction):** SDLC governs the *entire product's* life (design through maintenance); STLC governs only the *testing discipline's* activities and can run in parallel with, or be nested inside, the corresponding SDLC phases (e.g., in Agile, one STLC cycle completes every sprint).
 
-#### Defect Classification by Origin
+### 9. Defects — Terminology and Classification
+
+**Precise terminology (often confused — a good viva differentiator):**
+- **Error/Mistake** — a human action that produces an incorrect result (e.g., a developer misreads a spec).
+- **Defect/Bug/Fault** — the flaw left in the code/artifact as a *result* of that error.
+- **Failure** — the *observable* deviation from expected behaviour when the defect is executed under the right conditions.
+
+**A defect** is thus any deficiency in a work product that fails to meet requirements/specification; it is discovered when expected result ≠ actual result, and must be repaired or the component replaced.
+
+#### Types of Defects (by origin)
 
 | Category | Sub-types | Example |
 |---|---|---|
-| **Requirement & specification** | Functional-description defects (ambiguous I/O); feature defects (missing NFR, e.g., performance); feature-interaction defects; interface-description defects | "Add customer" and "customer classification" specified separately but interacting |
-| **Design** | Algorithmic/processing; control/logic/sequence; data (wrong structure/type/size); module-interface (wrong parameter count/type); external-interface defects | `a + b / 2` designed instead of `(a + b) / 2` |
-| **Coding** | Algorithmic (sign, overflow/underflow, precedence); control/logic; typographical/syntax; initialization; data-flow; module-interface; documentation; external HW/SW interface | Uninitialized loop counter causing off-by-one |
-| **Testing** | Test-harness/scaffolding defects; test-case/procedure defects (wrong, incomplete, missing) | Test oracle computes a wrong expected result |
+| **1. Requirement & Specification Defects** | Functional description defects (ambiguous input/output), Feature defects (missing NFR like performance), Feature interaction defects (two features affecting each other unaccounted for), Interface description defects (SW–HW–user interface mismatch) | "Add customer" and "customer classification" specified independently, but interact in practice |
+| **2. Design Defects** | Algorithmic/processing (e.g., `a+b/2` instead of `(a+b)/2`), Control/logic/sequence (wrong branching, wrong call order), Data defects (wrong data structure/type/size), Module interface defects (wrong parameter count/type), Functional description defects, External interface defects (missing commands/feedback) | Submit button enabled before mandatory fields are filled |
+| **3. Coding Defects** | Algorithmic (sign errors, overflow/underflow, misused parentheses), Control/logic/sequence (wrong case statements, missing paths), Typographical (syntax errors), Initialization defects, Data-flow defects, Module interface defects, Documentation defects, External HW/SW interface defects | Uninitialized loop counter causing an off-by-one bug |
+| **4. Testing Defects** | Test harness/scaffolding defects (auxiliary test code itself is buggy), Test case/procedure defects (incomplete/incorrect/missing test cases) | A test oracle that computes the "expected result" wrong |
 
-> **Added: phase containment.** Defects should be found in the phase where they were injected. Defects that *escape* to later phases (or production) are called **leakage**; see metrics in §1.11.
+### 10. Defect Management Process
+A closed-loop process: **Discovery → Reporting → Categorization (priority: Critical/High/Medium/Low) → Resolution (assigned to developer, fixed, reported back) → Verification (QA confirms the fix) → Closure.**
+Purpose: feed information back into the development process and make the product more effective/efficient — not just "log and forget."
 
-### 1.10 Defect Management and Life Cycle
-
-**Process:** Discovery → Reporting → Categorization (severity/priority) → Resolution → Verification (retest) → Closure. The purpose is to feed information back into development, not just log and forget.
+### 11. Defect / Bug Life Cycle (states)
 
 ```mermaid
 stateDiagram-v2
     [*] --> New
-    New --> Assigned : Triage accepts
-    New --> Rejected : Invalid / not reproducible
-    New --> Duplicate : Already reported
-    New --> Deferred : Valid, postponed
-    Assigned --> Open : Developer starts
-    Open --> Fixed : Fix delivered
-    Fixed --> Retest : Build with fix
-    Retest --> Verified : Fix confirmed
-    Retest --> Reopened : Fix failed
-    Reopened --> Open
+    New --> Assigned
+    New --> Rejected
+    New --> Deferred
+    Assigned --> Active
+    Active --> Test
+    Test --> Verified
+    Test --> Reopened
+    Reopened --> Active
     Verified --> Closed
     Rejected --> [*]
-    Duplicate --> [*]
     Deferred --> [*]
     Closed --> [*]
 ```
 
 | State | Meaning |
 |---|---|
-| **New** | Logged, not yet triaged |
-| **Assigned** | Routed to a developer/team |
-| **Open / Active** | Developer working on the fix |
-| **Fixed / Test** | Fix delivered, awaiting QA |
-| **Retest → Verified** | QA confirms the fix works |
-| **Closed** | Confirmed resolved (final state) |
-| **Reopened** | Fix insufficient; returns to Open |
-| **Rejected** | Not a defect, or not reproducible |
-| **Duplicate** | Same as an existing defect |
-| **Deferred** | Valid but postponed to a later release |
+| **New** | Defect logged, not yet validated |
+| **Assigned** | Routed to a developer/team to fix |
+| **Active / Open** | Developer is working on the fix |
+| **Test** | Fix delivered, ready for QA retest |
+| **Verified** | QA confirms the fix works |
+| **Closed** | Retested and confirmed resolved (final state) |
+| **Reopened** | QA finds the fix insufficient; cycle restarts from Active |
+| **Rejected** | Not a genuine defect, or a duplicate, or not reproducible |
+| **Deferred** | Valid defect but postponed to a future release/cycle |
 
-State names vary by tool (Jira, Bugzilla); the flow is what matters. **Exam tip:** always draw *Reopened → Open* and mention Rejected/Deferred as side exits.
-
-#### Severity vs. Priority
-
-| | **Severity** | **Priority** |
-|---|---|---|
-| Meaning | Technical impact of the defect on the system | Business urgency of fixing it |
-| Set by | Tester / QA | Product owner / manager |
-| Levels | Critical, Major, Minor, Trivial | High, Medium, Low |
-
-| Combination | Example |
-|---|---|
-| High severity, high priority | Payment fails at checkout |
-| High severity, low priority | Crash in a rarely used legacy export feature |
-| Low severity, high priority | Company name misspelled on the home page |
-| Low severity, low priority | Minor alignment issue on an unvisited admin page |
-
-#### Defect Report: Essential Fields
-ID · title · environment/build · steps to reproduce · expected vs actual result · severity · priority · status · attachments (logs, screenshots) · reporter/assignee · date.
-
-### 1.11 Test Metrics *(Added)*
-
-| Metric | Formula |
-|---|---|
-| Requirement coverage | Requirements with ≥ 1 test ÷ total requirements × 100 |
-| Test execution progress | Tests executed ÷ tests planned × 100 |
-| Pass rate | Tests passed ÷ tests executed × 100 |
-| Defect density | Defects found ÷ size (KLOC or function points) |
-| Defect Removal Efficiency (DRE) / Defect Detection Percentage | Defects found before release ÷ (found before + found after release) × 100 |
-| Defect leakage | Defects found in later phase/production ÷ total defects × 100 |
-
-### Exam Focus: Unit I
-- Differentiate error, defect, failure with an example.
-- Draw and explain the bug life cycle; distinguish severity from priority.
-- State and justify any four testing principles.
-- Compare Waterfall, V-model and Agile from a testing viewpoint.
-- Explain STLC phases with entry/exit criteria.
-- Verification vs validation; QA vs QC.
+**Example stakeholder mapping (common exam question style):**
+- *Payroll System* → Employees, Accountant, Cashier, Registrar, Principal, Income-tax personnel
+- *Railway Reservation System* → Passenger, Train conductor, Ticket counter clerk, Government
+- *Hospital Management System* → Patients, Doctors, Nurses, Ward boys, Police, Technicians, Support staff
 
 ---
 
-## Unit II: Types of Testing
+## Unit II — Types of Testing
 
-### 2.1 Classification: Testing Is Classified Along Several Independent Axes
+### 1. The Classification Tree
+```mermaid
+flowchart TD
+    T[Testing] --> M[Manual Testing]
+    T --> A[Automation Testing]
+    M --> WB[White Box]
+    M --> BB[Black Box]
+    M --> GB[Gray Box]
+    WB --> F[Functional Testing]
+    BB --> F
+    GB --> F
+    WB --> NF[Non-Functional Testing]
+    BB --> NF
+    GB --> NF
+    F --> U[Unit Testing]
+    F --> I[Integration Testing]
+    F --> S[System Testing]
+    F --> AC[Acceptance Testing]
+    NF --> P[Performance Testing]
+    NF --> US[Usability Testing]
+    NF --> C[Compatibility Testing]
+    P --> L[Load Testing]
+    P --> ST[Stress Testing]
+    P --> SB[Stability Testing]
+```
 
-The original tree mixes axes; separating them avoids confusion.
+### 2. Manual vs. Automation — Deep Comparison
 
-| Axis | Categories |
-|---|---|
-| **Execution approach** | Manual · Automated |
-| **Knowledge of internals** | White-box · Black-box · Gray-box |
-| **Test level** | Unit · Integration · System · Acceptance |
-| **Test objective (type)** | Functional · Non-functional (performance, usability, security, compatibility, etc.) · Change-related (confirmation, regression) |
+| Criteria | Manual Testing | Automation Testing |
+|---|---|---|
+| Basic premise | Human-driven, error-prone on repetition | Script-driven, highly reliable for repeated tasks |
+| Time | Slow | Fast |
+| Investment | Human resources | Tooling/licensing/scripting |
+| Best used when | Test run once or twice (exploratory/new features) | Test run repeatedly (regression) |
+| UI testing | Very effective (human judgment) | Weak (no human intuition) |
+| Initial cost | Low | High |
+| Build Verification Testing | Not recommended (too slow for every build) | Highly recommended |
+
+Representative tools: **Manual** — Testpad (checklist-based test planning). **Automation** — Selenium, QTP/UFT, LoadRunner, TestComplete, Kobiton.
+
+### 3. White-Box, Black-Box, Gray-Box Testing
+
+**White-Box Testing** (Structural / Glass-Box / Clear-Box)
+- Test cases derived from the **internal code structure** — statements, branches, conditions, paths.
+- Requires programming knowledge; done at **unit level**, can start early in SDLC.
+- Used to: uncover internal security holes, validate conditional-loop logic, exercise every statement/function.
+- ✅ Optimizes code (dead code removal), automatable, catches structural issues early.
+- ❌ Time-consuming, expensive, needs specialized tools (code analyzers/debuggers), can miss missing-functionality defects since it never looks outside the code.
+
+**Black-Box Testing** (Behavioural / Specification-Based)
+- Test cases derived purely from **requirements and observable behaviour** — internal design is irrelevant.
+- A tester with zero code knowledge can execute it (e.g., testing a website purely via the browser).
+- Targets: missing/incorrect functions, interface errors, behavioural errors, data-structure errors, initialization errors.
+- ✅ Unbiased (no code assumptions), scalable to large systems, usable by non-technical testers.
+- ❌ Hard to design without solid specs, hard to hit tricky edge-case inputs, risk of duplicating what the developer already unit-tested.
+
+**Gray-Box Testing** (hybrid — appears in the taxonomy and is commonly examined)
+- Tester has **partial knowledge** of internals (e.g., database schema, high-level architecture) while still testing mainly from the outside.
+- Combines the coverage precision of white-box thinking with the end-user realism of black-box execution — typically used for integration and security testing where knowing data flow helps target tests without needing full source-level access.
+
+### 4. Functional Testing Levels
+
+**Unit Testing**
+- Tests the smallest testable unit — a function/method/module — in isolation. Usually done **by the developer** during coding.
+- Objectives: isolate a code section, verify correctness, exercise every function/procedure, catch defects early (cheapest fix point), enable safe code reuse.
+- Workflow: **Create test case → Review → Baseline → Execute.**
+- Tools: JUnit, NUnit, Jtest, EMMA, PHPUnit.
+- ✅ Refines code, confirms module-level correctness; ❌ time-consuming to write, doesn't cover non-functional aspects, doesn't prove absence of defects, needs ongoing maintenance as code changes.
+
+**Integration Testing**
+- Combines individually-tested units and tests them **as a group**, focused on the interfaces/interactions between modules.
+- Approaches:
+  - **Top-down** — start from top-level modules, use **stubs** to simulate not-yet-integrated lower modules.
+  - **Bottom-up** — start from lower-level modules, use **drivers** to simulate not-yet-integrated higher modules.
+  - **Big-Bang** *(standard technical addition)* — integrate all modules simultaneously and test as one; fast but hard to isolate the source of a failure.
+  - **Sandwich/Hybrid** *(standard technical addition)* — combines top-down and bottom-up to meet in the middle, balancing early testability against isolation of failures.
 
 ```mermaid
 flowchart TD
-    T["Software testing"] --> AP["By approach"]
-    T --> KN["By knowledge of code"]
-    T --> LV["By level"]
-    T --> OB["By objective"]
-    AP --> M["Manual"]
-    AP --> A["Automated"]
-    KN --> WB["White-box"]
-    KN --> BB["Black-box"]
-    KN --> GB["Gray-box"]
-    LV --> U["Unit"]
-    LV --> I["Integration"]
-    LV --> S["System"]
-    LV --> AC["Acceptance"]
-    OB --> F["Functional"]
-    OB --> NF["Non-functional"]
-    OB --> CH["Change-related"]
-    NF --> P["Performance"]
-    NF --> US["Usability"]
-    NF --> C["Compatibility"]
-    NF --> SEC["Security"]
-    CH --> CT["Confirmation (re-test)"]
-    CH --> R["Regression"]
-```
-
-> **Exam tip:** Any test level can use any knowledge approach and any objective. Example: a *system-level*, *black-box*, *performance* test.
-
-### 2.2 White-Box, Black-Box, Gray-Box
-
-| | **White-box** (structural, glass-box) | **Black-box** (behavioural, specification-based) | **Gray-box** |
-|---|---|---|---|
-| Test basis | Internal code and design | Requirements and observable behaviour | Requirements + partial internals (schema, architecture, API contracts) |
-| Tester skill | Programming needed | No code knowledge needed | Some technical knowledge |
-| Typical level | Unit (and some integration) | System, acceptance | Integration, security, web/API |
-| Techniques | Statement, branch, condition, path coverage | EP, BVA, decision table, state transition, use case | Matrix testing, pattern testing, DB-aware end-to-end tests |
-| Finds | Logic errors, dead code, security holes, untested paths | Missing/incorrect functions, interface errors, behaviour errors | Data-flow and integration defects |
-| Weakness | Cannot find *missing* functionality; costly, needs tools | Hard to hit obscure inputs; may repeat developer's unit tests | Limited by partial knowledge |
-
-### 2.3 Manual vs. Automation
-
-| Criterion | Manual | Automation |
-|---|---|---|
-| Executor | Human tester | Scripts/tools |
-| Best for | Exploratory, usability, ad-hoc, one-off tests, new features | Regression, load/performance, cross-browser, build-verification, data-driven tests |
-| Initial cost | Low | High (tools, scripting, framework) |
-| Long-run cost | High for repeated runs | Low once scripts are stable |
-| Reliability on repetition | Falls with fatigue | Consistent |
-| UI/UX judgment | Strong | Weak (no human perception) |
-| Maintenance | None | Scripts break when the UI changes (flaky/brittle tests) |
-
-**When to automate:** stable features, high-repetition tests, large data sets, tests needing precision or parallel runs. **When not to:** rapidly changing UI, one-time tests, usability/visual judgment.
-
-### 2.4 Test Levels (Functional Testing)
-
-#### Unit Testing
-- Tests the smallest testable unit (function, method, class) in isolation, normally by the developer.
-- **Isolation uses test doubles:** *stub* (returns canned answers), *mock* (verifies interactions/calls), *fake* (lightweight working implementation, e.g., in-memory DB), *spy* (records calls), *dummy* (fills a parameter).
-- **Workflow:** create test → review → baseline → execute.
-- **Tools:** JUnit, TestNG, NUnit, PHPUnit, pytest, Jest.
-- **Pros:** earliest and cheapest fix point; enables safe refactoring. **Cons:** effort to write and maintain; does not test integration or non-functional qualities; cannot prove absence of defects.
-
-#### Integration Testing
-Tests interfaces and interactions between separately tested units.
-
-| Approach | Description | Needs | Pros | Cons |
-|---|---|---|---|---|
-| **Top-down** | Start from top modules, move downward | **Stubs** for missing lower modules | Early check of main control flow | Low-level modules tested late; many stubs |
-| **Bottom-up** | Start from low-level modules, move upward | **Drivers** for missing upper modules | Early testing of foundational modules | Top-level flow tested late |
-| **Big-bang** | Integrate everything, then test | None up front | Simple for small systems | Hard to isolate the failing interface |
-| **Sandwich / hybrid** | Top-down and bottom-up meeting in the middle | Both | Balanced, parallel | More complex planning |
-
-```mermaid
-flowchart TD
-    subgraph TD1["Top-down: lower modules replaced by stubs"]
-    A1["Module A (real)"] --> B1["Module B (stub)"]
-    A1 --> C1["Module C (stub)"]
+    subgraph "Top-Down (uses Stubs for lower modules)"
+    M1[Module 1] --> M2[Module 2]
+    M1 --> M3[Module 3]
     end
-    subgraph BU1["Bottom-up: upper modules replaced by drivers"]
-    DR["Driver (calls module)"] --> B2["Module B (real)"]
-    DR --> C2["Module C (real)"]
+    subgraph "Bottom-Up (uses Drivers for upper modules)"
+    M4[Module 4] --> M2b[Module 2]
+    M5[Module 5] --> M2b
+    M6[Module 6] --> M3b[Module 3]
     end
 ```
+- ✅ Efficient for smaller systems, surfaces interface defects early; ❌ can delay the overall schedule, risk of missing an interface if too many modules are combined at once.
 
-> **Mnemonic:** **S**tubs stand **u**nder (replace called, lower modules); **D**rivers **d**rive from above (replace calling, upper modules).
+**System Testing**
+- Validates the **fully integrated** system end-to-end against the complete SRS — both functional and non-functional requirements (accuracy, reliability, speed).
+- ✅ Confirms real-world behaviour, catches bugs before production, improves overall efficiency; ❌ can duplicate lower-level checks (redundant testing), risk of missing subtle logical errors that only show up under specific workflows.
 
-#### System Testing
-- Validates the fully integrated system end to end against the SRS, covering functional and non-functional requirements (performance, security, reliability, compatibility).
-- Performed in a production-like environment by an independent test team. **Cons:** can overlap earlier levels; needs a complete environment.
+**Acceptance Testing**
+- The final validation gate, typically performed **by the customer/end-user**, to certify the system meets the agreed (contractual) requirements — maps 1:1 against Requirement Analysis in the V-model (System Testing ↔ High-Level Design, Integration Testing ↔ Low-Level Design, Unit Testing ↔ Coding).
+- Common sub-types *(standard addition, frequently examined)*: **Alpha testing** (in-house, before release, by internal staff simulating users) and **Beta testing** (real users in a real environment, before General Availability); **UAT (User Acceptance Testing)** is the formal customer sign-off variant.
+- ✅ Confirms fitness-for-purpose before go-live, easy to run, lets customer/developer jointly resolve issues, reduces failure risk; ❌ feedback quality depends on non-expert users who may lack testing skill.
 
-#### Acceptance Testing
-- Final gate: decides whether the system can be accepted for delivery/release. Performed by customers, end-users or their representatives.
+### 5. Non-Functional Testing
+Checks *how well* the system performs a function, not *whether* it performs it (e.g., functional: "does login succeed?"; non-functional: "how many concurrent logins can the system sustain?").
 
-| Type | Description |
+**Performance Testing** — validates behaviour under load, measured via:
+- **Stability** — how long the system resists failure under sustained use.
+- **Speed** — responsiveness to user actions.
+- **Scalability** — how gracefully the system handles increasing load.
+- Common sub-types *(standard addition)*: **Load Testing** (expected concurrent load), **Stress Testing** (beyond capacity, to find the breaking point), **Spike Testing** (sudden load surges), **Soak/Endurance Testing** (sustained load over long duration to catch memory leaks).
+- ✅ Confirms reliability, benchmarks systems against each other, validates overall performance ceiling.
+
+**Usability Testing** — evaluates ease-of-use, learnability, and user satisfaction with the interface.
+
+**Compatibility Testing** — confirms consistent behaviour across browsers/OS/devices/hardware configurations.
+
+### 6. Regression Testing
+- **Definition:** Re-executing a full or partial set of already-passed test cases to confirm that a recent code change (new feature, bug fix, optimization, config change, patch) has **not broken existing functionality**.
+- **Triggered by:** new requirement added to existing feature, new feature added, defect fix, performance optimization, patch, configuration change.
+- **Selection strategies** *(standard technical addition)*: **Retest-all** (re-run the entire suite — safest but slowest), **Regression test selection** (re-run only tests touching the changed area — needs good impact analysis/RTM), **Test case prioritization** (run highest-risk/most-critical tests first, useful under time pressure).
+- Regression testing is the primary reason **automation** pays off — the same suite re-runs every build/sprint at near-zero marginal cost once scripted.
+
+### 7. Automation Testing — Why and With What
+**Benefits:** improves quality by shortening release cycles, removes human error, executes faster (and can run unattended overnight), improves consistency/reliability, enables more frequent releases, doesn't need to wait on manual test-engineer availability.
+
+**Representative tools (know one detail about each for MCQs):**
+
+| Tool | Distinguishing feature |
 |---|---|
-| **UAT (User Acceptance Testing)** | Formal user sign-off against business needs |
-| **Alpha testing** | In-house, by internal staff/independent testers, before external release |
-| **Beta testing** | Real users in a real environment before general availability |
-| **Contractual / regulatory acceptance** | Against contract terms or legal/regulatory standards |
-| **OAT (Operational Acceptance)** | Backup/restore, maintainability, security procedures, admin readiness |
-
-### 2.5 Non-Functional Testing
-Checks **how well** the system behaves, not **whether** it does a function. Example: functional: "does login succeed?"; non-functional: "how many concurrent logins can it sustain within 2 s?"
-
-| Type | Question answered |
-|---|---|
-| **Performance** | Is it fast, stable and scalable enough? |
-| **Usability** | Is it easy to learn and use? Are users satisfied? |
-| **Compatibility** | Does it work across browsers, OS, devices, versions? |
-| **Security** | Are confidentiality, integrity, authentication, authorization preserved? |
-| **Reliability** | Does it run without failure for a specified time? |
-| **Accessibility** | Usable by people with disabilities (WCAG)? |
-| **Localization / Internationalization** | Correct behaviour across languages, currencies, date formats? |
-| **Maintainability / Portability** | Easy to modify / move to another platform? |
-
-#### Performance Testing Subtypes
-
-| Subtype | Load applied | Objective |
-|---|---|---|
-| **Load** | Expected/peak realistic load | Confirm targets are met |
-| **Stress** | Beyond capacity | Find the breaking point and check graceful degradation/recovery |
-| **Spike** | Sudden sharp surge | Test behaviour on abrupt load change |
-| **Soak / Endurance (stability)** | Normal load for a long period | Detect memory leaks, resource exhaustion |
-| **Scalability** | Increasing load with added resources | Measure how capacity grows |
-
-**Key metrics:** response time (use percentiles, e.g., p95/p99, not just averages), throughput (requests/sec), latency, error rate, resource utilization (CPU, memory, I/O), concurrent users.
-
-### 2.6 Change-Related Testing
-
-| | **Confirmation (Re-testing)** | **Regression** |
-|---|---|---|
-| Purpose | Verify a specific **fixed defect** is really fixed | Verify the change did **not break** existing functionality |
-| Test cases | The **failed** test(s) re-run | Previously **passed** tests |
-| Scope | Narrow | Broad (selected or full suite) |
-| Automation | Usually manual, one-time | Prime candidate for automation |
-
-**Regression triggers:** new feature, defect fix, performance optimization, patch, configuration change, environment change.
-**Strategies:** *retest-all* (safest, slowest) · *regression test selection* (impact analysis + RTM) · *test case prioritization* (highest-risk first under time pressure).
-
-| | **Smoke testing** | **Sanity testing** |
-|---|---|---|
-| Purpose | Is the build stable enough to test at all? | Is the specific change/fix reasonable and working? |
-| Scope | Broad and shallow (critical paths) | Narrow and deep (affected area) |
-| When | On every new build, before detailed testing | After a minor change or fix |
-| Scripted | Often (automated) | Often unscripted |
-
-### 2.7 Test Automation
-
-**Benefits:** faster execution and shorter cycles, unattended/overnight and parallel runs, elimination of manual slips, consistency, more frequent releases, reusable regression suites.
-**Risks:** high upfront cost, script maintenance when the UI changes, false confidence (automation only checks what it is told to check), flaky tests from timing/environment issues.
-
-**Framework types:** linear (record/playback) → modular → data-driven → keyword-driven → hybrid; design patterns such as **Page Object Model** keep locators separate from test logic to cut maintenance.
-
-| Tool | Notes |
-|---|---|
-| **Selenium** | Open-source browser automation; WebDriver API; languages: Java, Python, C#, JS, Ruby; runs with JUnit/TestNG/pytest; Selenium Grid for parallel runs |
-| **Playwright / Cypress** | Modern web-automation frameworks with auto-waiting and rich debugging |
-| **Appium** | Mobile (Android/iOS) automation |
-| **UFT (formerly QTP)** | Commercial functional-test tool (Micro Focus / OpenText) |
-| **JMeter / LoadRunner** | Load and performance testing |
-| **Postman / REST Assured** | API testing |
-| **Ranorex Studio** | Codeless + code-based; desktop, web, mobile |
-| **Kobiton** | Real-device mobile cloud lab |
-| **LambdaTest** | Cross-browser cloud grid, parallel execution |
-| **Avo Assure, testRigor, Subject7** | Codeless/natural-language test tools |
-| **Jira, TestRail, Zephyr** | Test management / defect tracking |
-
-> **Note:** vendor features change quickly; for exams remember the *category* and one distinguishing property per tool.
-
-### Exam Focus: Unit II
-- Black-box vs white-box vs gray-box (table above).
-- Stub vs driver; top-down vs bottom-up; V-model level mapping.
-- Load vs stress vs spike vs soak testing.
-- Regression vs re-testing; smoke vs sanity.
-- Alpha vs beta; when to automate.
+| **Selenium** | Open-source; browser automation (Selenium IDE supports Firefox natively); scripts exportable to Java, Python, C#, Ruby; integrates with JUnit/TestNG |
+| **Ranorex Studio** | All-in-one; codeless + full IDE; cross-platform (desktop/web/mobile); integrates with Jira/Git/Jenkins |
+| **Kobiton** | Mobile device-lab testing; supports Appium/Espresso/XCTest; scriptless "NOVA AI" |
+| **LambdaTest** | Cross-browser cloud grid (2000+ browser/OS combos); parallel execution |
+| **Avo Assure** | 100% no-code; heterogeneous (web, mainframe, ERP, mobile) |
+| **testRigor** | Tests written in plain English; covers web+mobile+API in one test |
+| **Subject7** | Cloud-based codeless; supports functional, regression, load, security, DB testing in one platform |
 
 ---
 
-## Unit III: Test Case Development
+## Unit III — Test Case Development
 
-### 3.1 Core Terms
+### 1. What Is a Test Case?
+A **document** capturing test data, pre-conditions, execution steps, expected results, actual results, and post-conditions, written to verify compliance against a *specific requirement/scenario*. It is the atomic unit from which test execution and traceability are built.
 
-| Term | Meaning |
+### 2. Test Documentation — Types
+
+| Document | Purpose |
 |---|---|
-| **Test condition** | An item or event that could be verified (e.g., "login rejects an invalid password") |
-| **Test scenario** | A high-level end-to-end situation to test ("user logs in") |
-| **Test case** | Specific inputs, preconditions, steps, expected result and postconditions for one condition |
-| **Test script** | Automated (or step-wise) implementation of a test case |
-| **Test procedure** | Ordered sequence of test cases to execute together |
-| **Test suite** | Collection of test cases grouped for a purpose (smoke suite, regression suite) |
-| **Test oracle** | Source of the **expected result** (spec, prior version, calculation, domain expert) |
-| **Test data** | Inputs the test consumes |
+| **Test Policy** | Organization-wide principles, methods, and testing goals (highest level) |
+| **Test Strategy** | Identifies which test levels/types will be executed for a given project |
+| **Test Plan** *(standard addition — the document that operationalizes strategy)* | Scope, approach, resources, schedule, entry/exit criteria for a specific test cycle |
+| **RTM (Requirement Traceability Matrix)** | Maps requirements → test cases, to prove coverage |
+| **Defect Report** | Documents a flaw where the system fails its expected function |
+| **Test Case** | The individual input/steps/expected-output/result record for one scenario |
 
-Derivation flow: **test basis → test conditions → test cases → test procedures/scripts**.
+✅ **Advantages of test documentation:** removes ambiguity in task allocation, acts as training material for new testers, supports on-time quality delivery, improves configuration/setup repeatability, improves transparency with clients.
+❌ **Disadvantages:** costly and time-consuming to produce, quality depends on who writes it, tedious to keep updated, a poorly written document can make a genuinely good product look bad.
 
-### 3.2 Test Documentation
-
-| Document | Purpose | Level |
-|---|---|---|
-| **Test Policy** | Organization-wide goals and principles of testing | Organization |
-| **Test Strategy** | General approach: which levels/types/techniques/tools, independent of one project | Organization or program |
-| **Test Plan** | Project-specific: scope, approach, resources, schedule, risks, entry/exit criteria | Project / level |
-| **Test Design Specification** *(Added)* | Conditions/features to be tested and the technique used | Level |
-| **Test Case / Procedure** | Detailed steps, data, expected results | Detail |
-| **Test Log / Execution Report** | What was run and the results | Execution |
-| **RTM** | Maps requirements to test cases (coverage proof) | Cross-cutting |
-| **Defect / Incident Report** | Records a failure and its details | Execution |
-| **Test Summary / Closure Report** | Results, coverage, residual risk, lessons learned | Closure |
-
-> **Common confusion:** Policy → Strategy → Plan is a **scope hierarchy** (organization-wide → project-specific), not a sequence that includes RTM or defect reports. The list follows IEEE 829, now superseded by ISO/IEC/IEEE 29119-3.
-
-- **Advantages of documentation:** removes ambiguity in allocation, serves as training material, aids repeatability and audits, improves client transparency.
-- **Disadvantages:** costly and slow to produce, tedious to keep current, quality depends on author (mitigation: templates, reviews, lightweight documentation in Agile).
-
-### 3.3 Anatomy of a Test Case
+### 3. Anatomy of a Well-Formed Test Case
 
 | Field | Purpose |
 |---|---|
-| Test Case ID | Unique identifier (e.g., `TC_LOGIN_001`) |
-| Title / Description | What is verified |
-| Requirement ID | Link to RTM |
-| Pre-condition | State required before execution (e.g., account exists, browser open) |
-| Test Steps | Numbered actions |
-| Test Data | Concrete inputs |
-| Expected Result | Behaviour per requirement (from the oracle) |
-| Actual Result | Observed behaviour |
-| Status | Pass / Fail / Blocked / Not run |
-| Post-condition | State after execution (e.g., session created, audit log entry) |
-| Priority, Type, Author, Date | Management metadata |
+| Test Case ID | Unique identifier (e.g., `TU-1`) |
+| Test Case Description | What is being verified |
+| Pre-condition | State that must exist before the test runs (e.g., browser installed, valid account exists) |
+| Test Steps | Ordered actions to execute |
+| Test Data | Concrete input values used |
+| Expected Result | What *should* happen per the requirement |
+| Actual Result | What *did* happen on execution |
+| Status | Pass / Fail |
+| Post-condition | State expected to hold after the test completes (e.g., login timestamp persisted to DB) |
+| Notes | Any remarks/anomalies |
 
-**Worked example: login feature (positive and negative cases):**
+**Worked example — Google-style login test case:**
 
-| ID | Description | Pre-condition | Steps | Test data | Expected result | Type |
+| Test Case ID | Description | Steps | Test Data | Expected Result | Actual Result | Status |
 |---|---|---|---|---|---|---|
-| TC_LOGIN_001 | Login with valid credentials | Registered user exists | 1. Open login page 2. Enter user ID 3. Enter password 4. Click **Submit** | ID: `kk`, Pwd: `kk1` | User lands on dashboard; session created | Positive |
-| TC_LOGIN_002 | Login with wrong password | Registered user exists | Same steps | ID: `kk`, Pwd: `wrong` | Error "Invalid credentials"; no session | Negative |
-| TC_LOGIN_003 | Login with empty fields | Login page open | Click **Submit** with both blank | (none) | Field-level validation messages shown | Negative |
-| TC_LOGIN_004 | Account locks after repeated failures | Registered user exists | Submit wrong password 3 times | Pwd: `wrong` ×3 | Account locked; correct password now refused | Negative / boundary |
+| TU-1 | Check customer login with valid data | 1. Go to site 2. Enter user-id 3. Enter password 4. Click submit | user-id: kk / pwd: kk1 | User logs in successfully | As expected | Pass |
 
-Note that a good suite mixes positive and negative cases; the slide example had only the happy path.
+### 4. Best Practices for Writing Test Cases
+Keep each test case **simple, non-repetitive, end-user-focused, and self-cleaning** (doesn't leave residual test data/state behind); avoid assuming undocumented features; aim for **100% requirement coverage**; use recognized testing techniques (see Unit IV); make cases **identifiable** for defect tracking, **repeatable**, and **peer-reviewed**; keep each case to a manageable step count (rule of thumb: **≤ 15 steps**, split into multiple cases if longer).
 
-### 3.4 Best Practices for Writing Test Cases
-- Simple, unambiguous, one objective per test case; **independent** of other tests where possible.
-- **Traceable** to a requirement, with an identifiable ID; **repeatable** by anyone.
-- Written from the **end-user's viewpoint**; do not assume undocumented behaviour.
-- Cover positive, negative and boundary conditions; aim for **100% requirement coverage** and derive cases with recognized techniques (Unit IV).
-- Keep short (rule of thumb ≤ 15 steps); **self-cleaning** (leave no residual data/state).
-- **Peer-review** cases and keep them under version control; retire or update obsolete ones (avoids pesticide paradox).
+### 5. Test Analysis
+The process of examining test basis documents to derive **test conditions and test cases**. The three canonical sources:
 
-### 3.5 Test Analysis: Sources of Test Conditions
+| Source | What it defines |
+|---|---|
+| **SRS (Software Requirement Specification)** | The technical blueprint: functional + non-functional specs, external interfaces, design constraints, high-level system overview — the roadmap for *everyone* on the project |
+| **BRS (Business Requirement Specification)** | Formal client-facing document (written + verbal) describing *what the business needs*, how trading partners interact and share responsibilities |
+| **FDD (Functional Design Document)** | Explains *how* a process/system works operationally with minimal technical jargon — reviewed and signed off by stakeholders before build |
 
-| Source | Written by | Content | Answers |
-|---|---|---|---|
-| **BRS (Business Requirement Specification)** | Business analysts with client | Business needs and goals, in business language | *What does the business need?* |
-| **SRS (Software Requirement Specification)** | Analysts/architects | Functional + non-functional requirements, external interfaces, constraints | *What must the software do and how well?* |
-| **FDD (Functional Design Document)** | Designers | How the system will operate for users, with minimal jargon; reviewed and signed off | *How will it work?* |
+> **Quick differentiation:** BRS = *business* "what," SRS = *technical* "what + how it must behave," FDD = *operational* "how it will work for users." Test analysts trace test cases back to whichever of these is most granular for the requirement in question.
 
-Typical flow: **BRS → SRS → FDD / design docs → code**. Testers trace test cases back to the most granular of these for each requirement. Ambiguities found while analyzing requirements are themselves early defects (static testing).
+### 6. RTM — Requirement Traceability Matrix
+- **Definition:** A document proving that every requirement is covered by at least one test case, by mapping *Business Requirement → Functional Requirement → Priority → Test Case ID(s)*.
+- **Creation steps:** (1) Define the goal, (2) Establish artifacts and their relationships, (3) Fill in the matrix (Excel or any TCMT).
+- ✅ Gives a single view of requirement coverage, guarantees 100% traceability, needs no special tooling, quick to build.
 
-### 3.6 Requirement Traceability Matrix (RTM)
+### 7. Test Data
+| Category | Meaning |
+|---|---|
+| **Valid Data** | Sensible input the system should accept and process correctly |
+| **Extreme / Boundary Data** | Data sitting exactly at the edge of an allowed range (feeds directly into BVA in Unit IV) |
+| **Invalid / Erroneous Data** | Data the system must reject/handle gracefully, not process |
 
-**Definition:** a table mapping **Business Requirement → Functional Requirement → Priority → Test Case ID(s) → (Defect IDs)**, proving every requirement is tested.
+**Generation methods:** manual creation (commonly via Excel, considering test scenarios/conditions), or via a **Test Data Generator** tool that produces mock/synthetic data at scale.
 
-| BRS ID | SRS ID | Requirement | Priority | Test Case IDs | Status |
-|---|---|---|---|---|---|
-| BR-01 | FR-01 | Registered user can log in | High | TC_LOGIN_001–004 | Passed |
-| BR-01 | FR-02 | Lock account after 3 failed attempts | High | TC_LOGIN_004 | Failed (DEF-12) |
-
-- **Forward traceability:** requirement → test case (proves coverage).
-- **Backward traceability:** test case → requirement (finds tests with no requirement, i.e., scope creep).
-- **Bidirectional:** both.
-- **Uses:** coverage proof, **impact analysis** (which tests to re-run when a requirement changes), audit evidence.
-- **Creation:** (1) define goal, (2) identify artifacts to link, (3) populate in Excel or a test-management tool.
-
-### 3.7 Test Data
-
-| Category | Meaning | Example (Age 18–60) |
-|---|---|---|
-| **Valid** | Accepted and processed normally | 35 |
-| **Boundary / extreme** | At the edges of allowed ranges | 17, 18, 60, 61 |
-| **Invalid / erroneous** | Must be rejected or handled gracefully | −5, `abc`, blank, 9999 |
-
-- **Generation:** manual (spreadsheets), scripted, synthetic **test data generators**, or masked/anonymized copies of production data.
-- **Data privacy:** never use raw production personal data in test environments; use masking or synthetic data (relevant under India's DPDP Act 2023, GDPR, HIPAA).
-
-### 3.8 Test Case Management Tools (TCMT)
-Manage the full lifecycle: template-based authoring, suite organization, execution tracking, **defect linking** and end-to-end traceability (requirement ↔ test ↔ run ↔ defect), dashboards and reports, and protection of test assets. Examples: **Jira (with Xray/Zephyr), TestRail, HP/OpenText ALM (Quality Center), qTest**.
-
-### Exam Focus: Unit III
-- Write test cases for a given feature (login, ATM withdrawal, registration form).
-- Test case vs test scenario; test plan vs test strategy.
-- BRS vs SRS vs FDD.
-- What is an RTM, and how does it support impact analysis?
-- Pros and cons of test documentation.
+### 8. Test Case Management Tools (TCMT)
+Automation tools that manage the *lifecycle* of test cases: templated authoring (faster case creation), execution + result recording, **automated defect linking** to a bug tracker, end-to-end **traceability** (requirement ↔ test case ↔ execution ↔ defect), and protection of test assets from loss/corruption.
+Examples: **Jira, Zephyr, TestRail, HP Quality Center/ALM**.
 
 ---
 
-## Unit IV: Testing Techniques
+## Unit IV — Testing Techniques
 
-### 4.1 What a Technique Does
-A test technique is a systematic way to **derive test conditions and cases** so that a small, effective set of tests achieves good coverage (the practical answer to Principle 2: exhaustive testing is impossible). A technique is characterized by **who** applies it, **what coverage** it targets, **what defects** it tends to find, **how** it is applied and **how results are evaluated**.
+> This unit's slide deck only outlined the technique names; the explanations, worked examples, and formulas below fill that in with standard ISTQB-level technical depth expected in exams.
 
-Guiding principles: tests trace to requirements; testing is risk-based; plan before executing; start small (unit) and extend outward; concentrate on defect-prone areas (clustering); use independent testers where possible.
+### 1. The Five-Fold System of Any Testing Technique
+Every technique can be described along five axes: **Testers** (who applies it), **Coverage** (what gets exercised), **Potential problems** (what kind of defect it targets), **Activities** (how it is applied), **Evaluation** (how results are judged).
 
-### 4.2 Classification of Techniques
+### 2. Guiding Principles
+- All tests must trace back to user requirements.
+- Testing can be outsourced to a third party.
+- **Exhaustive testing is impossible** — testing is inherently **risk-based**.
+- Planning must precede execution.
+- Start small, extend to large (unit → integration → system).
+- **Pareto Principle** — 80% of defects cluster in ~20% of components (reiterates Unit I's Defect Clustering principle).
+
+### 3. Static vs. Dynamic Testing
 
 ```mermaid
 flowchart TD
-    T["Testing techniques"] --> S["Static"]
-    T --> D["Dynamic"]
-    S --> R["Reviews"]
-    S --> SA["Static analysis"]
-    R --> R1["Informal review"]
-    R --> R2["Walkthrough"]
-    R --> R3["Technical review"]
-    R --> R4["Inspection"]
-    SA --> SA1["Control-flow analysis"]
-    SA --> SA2["Data-flow analysis"]
-    D --> WB["Structure-based (white-box)"]
-    D --> BB["Specification-based (black-box)"]
-    D --> EB["Experience-based"]
-    WB --> W1["Statement coverage"]
-    WB --> W2["Branch / decision coverage"]
-    WB --> W3["Condition, MC/DC, path coverage"]
-    BB --> B1["Equivalence partitioning"]
-    BB --> B2["Boundary value analysis"]
-    BB --> B3["Decision table"]
-    BB --> B4["State transition"]
-    BB --> B5["Use case testing"]
-    EB --> E1["Error guessing"]
-    EB --> E2["Exploratory testing"]
-    EB --> E3["Checklist-based"]
+    T[Software Testing Techniques] --> S[Static Testing]
+    T --> D[Dynamic Testing]
+    S --> R[Reviews]
+    S --> SA[Static Analysis]
+    R --> R1[Informal Review]
+    R --> R2[Walkthrough]
+    R --> R3[Technical Review]
+    R --> R4[Inspection]
+    SA --> SA1[Control Flow Analysis]
+    SA --> SA2[Data Flow Analysis]
+    D --> ST[Structure-based / White-box]
+    D --> SP[Specification-based / Black-box]
+    D --> EX[Experience-based]
+    ST --> ST1[Statement Coverage]
+    ST --> ST2[Branch / Decision Coverage]
+    ST --> ST3[Condition Coverage]
+    SP --> SP1[Boundary Value Analysis]
+    SP --> SP2[Equivalence Partitioning]
+    SP --> SP3[Decision Table Testing]
+    SP --> SP4[State Transition Testing]
+    SP --> SP5[Use Case Testing]
+    EX --> EX1[Error Guessing]
+    EX --> EX2[Exploratory Testing]
 ```
 
-### 4.3 Static Testing
-
-| | **Static** | **Dynamic** |
+| | **Static Testing** | **Dynamic Testing** |
 |---|---|---|
-| Code executed? | No | Yes |
-| When | Very early (requirements, design, code) | After runnable code exists |
-| Finds | Defects (ambiguity, standards violations, dead code, data-flow anomalies) | Failures |
-| Cost | Cheaper per defect found | More expensive |
+| Code execution | Not executed | Executed |
+| Timing | Very early in SDLC | After code exists and runs |
+| Cost | Cheaper | More expensive |
+| Goal | Catch defects in design/requirements/code *before* they propagate | Catch defects by observing runtime behaviour |
 
-| Review type | Formality | Characteristics |
-|---|---|---|
-| **Informal review** | Lowest | No defined process; ad hoc feedback |
-| **Walkthrough** | Low–medium | Led by the **author**; used for learning and consensus |
-| **Technical review** | Medium–high | Peers check against standards/specs; led by trained moderator |
-| **Inspection** | Highest | Defined roles (moderator, author, reader, scribe, inspectors), checklists, entry/exit criteria, metrics collected |
+#### Static Testing Sub-Types
+- **Reviews** (human examination of documents):
+  - *Informal Review* — no formal process, ad hoc.
+  - *Walkthrough* — author presents a scenario/small set of test cases; team notes issues.
+  - *Technical Review* — checks against development standards/guidelines/specifications.
+  - *Inspection* — the most formal; systematically examines SRS, code, and design with defined roles and checklists.
+- **Static Analysis** (tool-driven, no execution):
+  - *Control Flow Analysis* — examines calling structure between functions/methods.
+  - *Data Flow Analysis* — tracks how data objects are defined, used, and destroyed to catch anomalies (e.g., use of an uninitialized variable).
 
-**Static analysis (tool-based):** *control-flow analysis* (call structure, unreachable code, infinite loops); *data-flow analysis* (define-use-kill anomalies, such as using an uninitialized variable). Tools: SonarQube, ESLint, Checkstyle, SpotBugs, Pylint.
+#### Dynamic Testing Sub-Types
+- **Structure-based (White-box)** — coverage-driven:
+  - *Statement Coverage* = (statements executed ÷ total statements) × 100
+  - *Branch/Decision Coverage* = (decision outcomes exercised ÷ total decision outcomes) × 100
+  - *Condition Coverage* — every individual Boolean sub-condition evaluated both True and False.
+  - *Multiple Condition Coverage* — every *combination* of condition outcomes exercised.
+  - *Decision (Path) Coverage* — every independent path through the control flow graph exercised.
+- **Specification-based (Black-box)** — Boundary Value Analysis, Equivalence Partitioning, Decision Table Testing, State Transition Testing, Use Case Testing (detailed below).
+- **Experience-based** — *Error Guessing* (tester uses experience to anticipate likely defect-prone areas) and *Exploratory Testing* (simultaneous learning, test design, and execution, without pre-scripted cases).
 
-### 4.4 Structure-Based (White-Box) Techniques
+### 4. Boundary Value Analysis (BVA)
+**Rationale:** defects statistically cluster at the *edges* of input ranges (off-by-one errors, `<` vs `<=` bugs), not in the middle — so test the boundaries, not just "typical" values.
 
-**Coverage** = (items exercised ÷ total items) × 100.
+**Rule:** for a valid range `[min, max]`, test: `min − 1` (just below, invalid), `min` (valid boundary), `min + 1` (just inside), `max − 1` (just inside), `max` (valid boundary), `max + 1` (just above, invalid).
 
-| Technique | Requirement for 100% |
+**Worked example** — an "Age" field accepting 18–60:
+| Test Value | Expected Result |
 |---|---|
-| **Statement coverage** | Every executable statement runs at least once |
-| **Branch / decision coverage** | Every decision takes both **True** and **False** outcomes |
-| **Condition coverage** | Every atomic Boolean condition is both True and False |
-| **Condition/decision coverage** | Both of the above |
-| **MC/DC** (Modified Condition/Decision Coverage) | Each condition is shown to **independently** affect the decision outcome; needs **N + 1** tests for N conditions (required for avionics, DO-178C Level A) |
-| **Multiple-condition coverage** | Every combination of condition outcomes (2ⁿ) |
-| **Path coverage** | Every independent path through the control-flow graph |
+| 17 | Rejected (below range) |
+| 18 | Accepted (lower boundary) |
+| 19 | Accepted |
+| 59 | Accepted |
+| 60 | Accepted (upper boundary) |
+| 61 | Rejected (above range) |
 
-**Subsumption (strength):** statement < branch < condition/decision < MC/DC < multiple-condition < path. 100% branch coverage guarantees 100% statement coverage, but not the reverse.
+### 5. Equivalence Partitioning (EP)
+**Rationale:** if the system is expected to treat a whole class of inputs the same way, testing *one representative value per class* is as effective as testing every value in that class — this is how you achieve good coverage without exhaustive testing (directly operationalizes Principle 2 from Unit I).
 
-**Worked example:**
+**Rule:** divide the input domain into **valid partitions** and **invalid partitions**; pick one representative test value from each.
 
-```text
-1  read(x, y)
-2  if (x > 0 AND y > 0)      // decision D with conditions C1: x>0, C2: y>0
-3      z = x + y
-4  else
-5      z = 0
-6  print(z)
-```
+**Worked example** — same Age field (18–60):
+- Invalid partition 1: age < 18 → representative test value: 10
+- Valid partition: 18 ≤ age ≤ 60 → representative test value: 35
+- Invalid partition 2: age > 60 → representative test value: 75
 
-| Test | (x, y) | C1 | C2 | D | Notes |
-|---|---|---|---|---|---|
-| T1 | (1, 1) | T | T | True | Covers lines 1, 2, 3, 6 |
-| T2 | (−1, 1) | F | T | False | Covers line 5 |
-| T3 | (1, −1) | T | F | False | |
-| T4 | (−1, −1) | F | F | False | |
+BVA and EP are almost always used **together** — EP picks the classes, BVA stress-tests their edges.
 
-- **Statement coverage 100%:** T1 + T2.
-- **Branch coverage 100%:** T1 + T2 (D takes True and False).
-- **Condition coverage 100%:** T3 + T2 alone give C1 = {T, F} and C2 = {F, T}, yet D is **never True**. This shows condition coverage does *not* imply branch coverage.
-- **MC/DC:** T1, T2, T3 (3 = N + 1 tests). T1 vs T2 isolates C1; T1 vs T3 isolates C2.
-- **Multiple-condition:** all four tests.
+### 6. Decision Table Testing
+**Rationale:** used when system behaviour depends on a **combination of conditions** (business rules) rather than a single input range.
 
-**Cyclomatic complexity (McCabe):** V(G) = E − N + 2P (edges, nodes, connected components) = number of decision points + 1. It gives the number of linearly independent paths, i.e., the minimum tests for **basis-path testing**, and flags overly complex, defect-prone modules (V(G) > 10 is a common refactoring flag).
+**Worked example** — a discount rule: "Give 10% discount if the customer is a Member AND the order total exceeds ₹1000."
 
-### 4.5 Boundary Value Analysis (BVA)
+| Rule | Member? | Order > ₹1000? | Action: Apply 10% Discount |
+|---|---|---|---|
+| 1 | Yes | Yes | Yes |
+| 2 | Yes | No | No |
+| 3 | No | Yes | No |
+| 4 | No | No | No |
 
-**Rationale:** defects cluster at the edges of ranges (off-by-one, `<` vs `<=`), so test the boundaries.
+Each column becomes one test case — this guarantees every meaningful *combination* of business conditions is exercised, which BVA/EP alone would not catch.
 
-**Rule (3-value BVA)** for valid range `[min, max]`: test `min−1, min, min+1, max−1, max, max+1`. (2-value BVA tests only `min−1, min, max, max+1`.)
+### 7. State Transition Testing
+**Rationale:** used when the system's behaviour for a given input **depends on its current state** (history matters).
 
-**Worked example:** Age field accepting integers 18–60.
-
-| Value | Position | Expected |
-|---|---|---|
-| 17 | Just below min | Rejected |
-| 18 | Min boundary | Accepted |
-| 19 | Just above min | Accepted |
-| 59 | Just below max | Accepted |
-| 60 | Max boundary | Accepted |
-| 61 | Just above max | Rejected |
-
-Also applies to lengths (password 8–16 characters), dates, quantities, file sizes and numeric limits.
-
-### 4.6 Equivalence Partitioning (EP)
-
-**Rationale:** inputs that the system treats the same way form a partition; one representative value from each is as good as any other, so tests are drastically reduced without losing partition-level coverage.
-
-**Rule:** split the domain into **valid** and **invalid** partitions; choose one representative per partition. Also consider partitions on non-numeric invalids (text, blank, special characters).
-
-**Worked example:** Age 18–60.
-
-| Partition | Range | Representative |
-|---|---|---|
-| Invalid (too low) | < 18 | 10 |
-| **Valid** | 18–60 | 35 |
-| Invalid (too high) | > 60 | 75 |
-| Invalid (non-numeric) | letters/blank | `abc` |
-
-**EP + BVA together:** EP selects the partitions; BVA stresses their edges. **Coverage** for EP = partitions tested ÷ total partitions.
-
-### 4.7 Decision Table Testing
-
-**Use when:** behaviour depends on **combinations of conditions** (business rules). List conditions, actions and every rule (2ⁿ for n binary conditions); each rule becomes a test case. Merge rules with "don't care" (–) entries to shrink the table.
-
-**Example:** *10% discount if the customer is a Member AND the order total exceeds ₹1000.*
-
-| Rule | R1 | R2 | R3 | R4 |
-|---|---|---|---|---|
-| **Member?** | Y | Y | N | N |
-| **Order > ₹1000?** | Y | N | Y | N |
-| **Apply 10% discount** | **Yes** | No | No | No |
-
-Since only R1 gives the discount, R2–R4 can collapse to `Member? = – / Order? = –` **when** not both Y; but keep all four when each combination is independently risky. Tests: (Member, ₹1500), (Member, ₹500), (Non-member, ₹1500), (Non-member, ₹500).
-
-### 4.8 State Transition Testing
-
-**Use when:** the response to an input **depends on the current state** (history matters). Model: states, events (inputs), transitions, guards (conditions), actions.
+**Worked example** — ATM PIN entry:
 
 ```mermaid
 stateDiagram-v2
     [*] --> Idle
-    Idle --> PINEntry : Insert card
+    Idle --> PINEntry : Insert Card
     PINEntry --> Authenticated : Correct PIN
-    PINEntry --> PINEntry : Wrong PIN, attempts < 3
-    PINEntry --> CardBlocked : Wrong PIN, 3rd attempt
-    Authenticated --> Idle : Transaction complete / eject card
+    PINEntry --> PINEntry : Wrong PIN (attempts < 3)
+    PINEntry --> CardBlocked : Wrong PIN (3rd attempt)
+    Authenticated --> [*] : Transaction Complete
     CardBlocked --> [*]
 ```
+- States: `Idle → PIN Entry → (Valid → Authenticated)` or `(Invalid, attempts < 3 → PIN Entry again)` or `(Invalid, attempts = 3 → Card Blocked)`.
+- Test cases are derived to cover **every valid transition** (e.g., Idle→PIN Entry→Authenticated) and **every invalid transition** (e.g., 3 consecutive wrong PINs → Card Blocked), because a purely input-based technique like EP would miss the "3rd wrong attempt" behaviour entirely.
 
-**State table** (also reveals invalid transitions to test):
+### 8. Use Case Testing
+**Rationale:** derives test cases directly from a use case's **actor–system interaction flow**, covering the *main (happy path) flow* and all documented *alternate/exception flows*.
 
-| Current state | Insert card | Correct PIN | Wrong PIN |
-|---|---|---|---|
-| Idle | → PINEntry | Invalid (ignored) | Invalid (ignored) |
-| PINEntry | Invalid | → Authenticated | → PINEntry (count++) or → CardBlocked at 3rd |
-| Authenticated | Invalid | Invalid | Invalid |
-| CardBlocked | Invalid | Invalid | Invalid |
+**Worked example** — "Book a Movie Ticket": main flow (select movie → select seats → pay → receive confirmation) plus alternate flows (seat becomes unavailable mid-selection, payment fails, session timeout) — each flow becomes at least one test case, ensuring end-to-end business-process coverage rather than isolated-field coverage.
 
-**Coverage levels:** *all states* < *all valid transitions* (0-switch) < *sequences of two transitions* (1-switch) < … *all transition pairs including invalid ones* (state-table coverage). Example tests: valid path Idle → PINEntry → Authenticated; 3 consecutive wrong PINs → CardBlocked; correct PIN on the 3rd attempt still authenticates; correct PIN after the card is blocked is refused.
-
-### 4.9 Use Case Testing
-
-**Use when:** deriving tests from actor–system interactions to check end-to-end business flows. Each use case has a **main (basic) flow** and **alternate/exception flows**; each flow yields at least one test.
-
-**Example: Book a Movie Ticket**
-
-| Flow | Steps / trigger | Expected |
-|---|---|---|
-| Main | Select movie → choose seats → pay → confirmation | Ticket issued, seats marked booked |
-| Alt 1 | Seats taken by another user during selection | Message shown; user re-selects |
-| Alt 2 | Payment fails | Booking not confirmed; seats released |
-| Alt 3 | Session times out | Selection cleared; user redirected |
-
-### 4.10 Other Black-Box Techniques *(Added)*
-- **Pairwise / combinatorial testing:** test all pairs of parameter values instead of all combinations (e.g., browser × OS × language), since most defects arise from interactions of two parameters.
-- **Cause-effect graphing:** map causes (inputs) to effects (outputs) with Boolean logic and convert to a decision table.
-- **Error-handling and negative testing:** deliberately invalid inputs and failure injection.
-
-### 4.11 Experience-Based Techniques
-- **Error guessing:** derive tests from experience of typical mistakes (null, zero, empty string, very large values, special characters, division by zero, leap-year dates). Often formalized as a **fault attack** list.
-- **Exploratory testing:** simultaneous learning, test design and execution, guided by a **charter** and time-boxed (session-based test management). Best for poorly specified systems and to supplement scripted tests.
-- **Checklist-based testing:** tests derived from a maintained checklist of conditions (UI checklists, security checklists).
-
-### 4.12 Choosing a Technique
-
-| Situation | Technique |
-|---|---|
-| Numeric ranges, lengths, ordered domains | EP + BVA |
-| Business rules with multiple interacting conditions | Decision table |
-| Behaviour depends on history/state, workflows | State transition |
-| End-to-end user scenarios | Use case testing |
-| Measuring code-level thoroughness | Structure-based coverage |
-| Poor documentation or time pressure | Exploratory, error guessing |
-| Requirements/design documents | Reviews, inspections |
-
-### 4.13 Agile Testing
-- Testing is a **whole-team** activity and happens continuously inside each sprint; testers join backlog refinement to define **acceptance criteria** early.
-- **TDD (Test-Driven Development):** *Red* (write a failing test) → *Green* (write minimal code to pass) → *Refactor*. Produces unit tests first, by developers.
-- **BDD (Behaviour-Driven Development):** scenarios in business-readable **Given / When / Then** form (Gherkin; tools: Cucumber, SpecFlow, Behave) shared by business, dev and QA; doubles as automated acceptance tests.
-
-```gherkin
-Scenario: Account locks after three wrong PINs
-  Given a card with PIN 1234 is inserted
-  When the user enters a wrong PIN three times
-  Then the card is blocked
-```
-
-- **Test automation pyramid:** many fast **unit** tests at the base, fewer **integration/API** tests in the middle, very few slow **UI/end-to-end** tests at the top. This keeps CI/CD feedback fast and cheap.
-
-```mermaid
-flowchart TB
-    UI["UI / end-to-end (few, slow, costly)"]
-    INT["Integration / API (moderate)"]
-    UNIT["Unit tests (many, fast, cheap)"]
-    UI --- INT --- UNIT
-```
-
-- **CI/CD:** each commit triggers build + automated unit, integration and smoke tests; a failing test blocks the pipeline. Regression suites run continuously.
-- **Agile testing quadrants (Marick/Crispin):** Q1 technology-facing tests supporting the team (unit, component); Q2 business-facing tests supporting the team (functional, story tests); Q3 business-facing tests critiquing the product (exploratory, UAT, usability); Q4 technology-facing tests critiquing the product (performance, security).
-
-### 4.14 Risk-Based Testing *(Added)*
-**Risk = likelihood of failure × impact of failure.** Rank features by risk; allocate more depth, earlier execution and stronger techniques to high-risk areas. This is the operational form of "exhaustive testing is impossible": when time runs out, the highest risks have already been tested.
-
-### Exam Focus: Unit IV
-- Generate test cases for a field/range using EP + BVA (state the range, list partitions and boundary values).
-- Build a decision table from a business rule and derive test cases.
-- Draw a state-transition diagram for ATM/login/order status and list valid and invalid transitions.
-- Compute statement/branch coverage for a code snippet; explain why condition coverage ≠ branch coverage.
-- Static vs dynamic; walkthrough vs inspection; TDD vs BDD.
+### 9. Agile Testing Methodology (brief)
+- Testing is continuous, embedded in every sprint rather than a terminal phase (contrast with Waterfall's late-stage testing in Unit I).
+- **TDD (Test-Driven Development)** — write the (failing) test before the code; implement just enough code to pass it; refactor.
+- **BDD (Behaviour-Driven Development)** — test scenarios written in business-readable language (Given/When/Then) so QA, dev, and business stakeholders share one specification.
+- **Testing Pyramid** — many fast Unit tests at the base, fewer Integration tests in the middle, very few slow end-to-end/UI tests at the top — this shape keeps CI/CD pipelines fast while still validating the whole system.
 
 ---
 
-## Unit V: Testing Different Domains
+## Unit V — Testing Different Domains
 
-**Why domain testing?** Generic functional and non-functional testing is not enough. Each industry has specific regulations, workflows, data standards and risk profiles. **Domain knowledge** shortens tester training, speeds defect triage, improves test design and makes business rules and terminology easier to validate.
+Domain testing recognizes that *generic* functional/non-functional testing isn't enough — each industry has its own regulatory constraints, workflows, and risk profile that testers must understand to design meaningful test cases.
 
-### 5.1 Web Domain
+### 1. Web Domain Testing
+**Structure:** built on HTML/CSS/JavaScript; can be static or dynamic hosted; single-page, multi-page, or progressive-web-app architectures. Full test coverage spans **Unit → Integration → System → Acceptance → Performance** testing layers, across all major browsers (Chrome, Firefox, Safari, Edge, Opera).
 
-Built on HTML/CSS/JavaScript with a client ↔ web server ↔ application server ↔ database architecture; may be static or dynamic, single- or multi-page, or a progressive web app.
-
+**Testing activities:**
 | Area | What is checked |
 |---|---|
-| **Functionality** | Links (internal, external, mailto, anchor, broken links); forms (validation, defaults, DB writes); cookies and sessions; end-to-end workflows; negative scenarios |
-| **Usability** | Navigation consistency, content quality, `alt` text, responsive design, error messages; **accessibility (WCAG)** |
-| **Interface** | Web ↔ app ↔ database hand-offs; correct requests/responses; errors shown to admins/logs, not raw to users; timeouts handled |
-| **Database** | Query correctness, CRUD integrity, transaction handling, query performance |
-| **Compatibility** | Browsers (Chrome, Firefox, Safari, Edge), OS, devices, screen sizes, versions |
-| **Performance** | Load/stress at varied network speeds, caching, compression, page load time (Core Web Vitals) |
-| **Security** | Authentication/authorization, session timeout, HTTPS/SSL redirection, protection of restricted files, **OWASP Top 10** (injection, XSS, CSRF, broken access control) |
+| **Functionality** | Links (internal, outgoing, mail-to, anchor), HTML/CSS rendering, forms (script validation, default values, live DB writes, formatting), end-to-end business workflow across pages, negative scenarios |
+| **Usability** | Site navigation (menus/buttons/links), content quality (spelling/grammar, `alt` text on images) |
+| **Interface** | App server ↔ Web server ↔ Database server hand-offs — correct requests/responses, errors surfaced to admins not end-users, no service denial |
+| **Database** | Query correctness, data integrity (CRUD), query response time/tuning, accuracy of retrieved data |
+| **Compatibility** | Cross-browser and cross-OS rendering consistency |
+| **Performance** | Response time at varying connection speeds, load/stress behaviour, crash resistance under peak load, optimization (e.g., gzip compression) |
+| **Security** | Unauthorized-access prevention, restricted-file protection, session timeout on inactivity, SSL redirection |
 
-**Tools:** Selenium, Playwright, Cypress (functional); JMeter (load); OWASP ZAP, Burp Suite (security); Lighthouse (performance/accessibility); BrowserStack/LambdaTest (compatibility). **Crowd testing** uses distributed real users for realistic usability and device coverage.
+Representative tools: Selenium, QTP; **Intruder** (vulnerability scanner, 10,000+ automated security checks); **Crowd Testing** (large distributed user groups for real-world usability/compatibility feedback).
 
-### 5.2 Banking and Finance Domain
+### 2. Finance / Banking Domain Testing
+- Three pillars of banking software testing: **Functionality, Performance, Security.**
+- Purpose: ensure the software runs error-free *and* stays protected — banking apps handle transfers, deposits, withdrawals, balance enquiries, fixed deposits.
+- **Traditional Banking Sector** — Core, Corporate, Retail Banking.
+- **Service-Based Banking Sector** — adds Loan Banking, Trade Banking, Private Banking, Consumer Finance, Islamic Finance, Customer Delivery Channels.
+- **Domain knowledge matters because it:** shortens tester training time, speeds up defect triage, improves grasp of UI + backend interplay, builds understanding of business workflow/rules, and makes technical terminology easier to work with.
+- **System characteristics to test against:** thousands of concurrent sessions, integration with Demat accounts/cards/bill-pay, fast+secure transaction processing, massive storage, complex workflows, multi-platform (Linux/Unix/Windows), multi-location and multi-lingual users, multiple payment networks (Visa/AMEX/Mastercard), multiple service sectors (retail, loan, etc.).
 
-**Three pillars:** Functionality · Performance · Security. Banking software handles transfers, deposits, withdrawals, balance enquiries, loans and fixed deposits with legal and financial consequences for errors.
+### 3. E-Commerce Domain Testing
+**Objective:** validate reliability, functionality, and security of an online store end-to-end, ensuring conformity to client requirements while preventing defects that cost sales or trust.
 
-- **Sectors:** *Traditional* (core, corporate, retail banking); *service-based* (loan, trade, private banking, consumer finance, Islamic finance, delivery channels).
-- **System characteristics:** thousands of concurrent sessions; integration with cards, demat accounts, bill-pay and payment networks (Visa, Mastercard, AMEX; in India, **UPI/NPCI**, NEFT/RTGS/IMPS); multi-platform and multi-lingual/multi-currency; large data volumes; complex workflows.
-
-| Testing focus | What is validated |
+| Testing Type | What it covers |
 |---|---|
-| **Transaction integrity (ACID)** | Atomicity, consistency, isolation, durability; rollback on failure; no double-debit |
-| **Business rules** | Interest calculation, charges, limits, account-type rules, rounding |
-| **Security** | Encryption, multi-factor authentication, session control, audit trails, **PCI DSS** for card data |
-| **Batch / end-of-day processing** | Interest posting, statement generation, reconciliation |
-| **Integration** | Core banking ↔ payment gateways/switches; messaging standards (e.g., ISO 8583 for card transactions, ISO 20022 for payments) |
-| **Performance** | Peak-load behaviour (salary day, festival sales), failover |
-| **Compliance** | Regulator rules (RBI in India), KYC/AML checks, maker-checker (dual control) workflows |
+| **Functionality** | Requirement-derived test cases, execution, defect reporting |
+| **Usability** | Intuitive design, site/catalog navigation, help support, real-user feedback |
+| **Security** | Vulnerability assessment, patching, ongoing protocol updates |
+| **Session Management** | Session expiration, session storage |
+| **Browser Compatibility** | Cross-browser support, browser-specific extensions, cross-platform coverage |
+| **Page Display** | Correct rendering, runtime errors, download time, dead hyperlinks, font/plugin issues |
+| **Content Analysis** | No misleading/offensive content, royalty-cleared images, personalization, 24/7 availability |
+| **Availability** | Resistance to Denial-of-Service, acceptable uptime |
+| **Backup & Recovery** | Fail-over recovery, backup-failure handling, fault tolerance |
+| **Transactions** | Transaction integrity, throughput, auditing |
+| **Order Processing** | Shopping cart, order processing, payment processing, order tracking |
+| **Internationalization** | Language support/display, cultural sensitivity, regional accounting rules |
 
-### 5.3 E-Commerce Domain
+### 4. Healthcare Domain Testing
+**Objective:** ensure software reliability, quality, **system safety**, performance, and efficiency in a domain where a defect can have life-safety consequences.
 
-**Objective:** validate reliability, functionality and security of an online store so defects do not cost sales or trust.
+**Stakeholder ecosystem:** Patient/Consumer, Hospital, Insurance Company, Healthcare & life-science solution vendors, and Regulatory Authorities enforcing standards such as **HIPAA** (patient data privacy, US), **OASIS**, and **HCFA-1500** (standard healthcare claim form).
 
-| Testing type | Coverage |
-|---|---|
-| **Functionality** | Search, filters, catalog, product pages, cart, coupons, checkout |
-| **Usability** | Navigation, catalog browsing, help, real-user feedback |
-| **Security** | Vulnerability assessment, payment data protection, patching |
-| **Session management** | Expiry, cart persistence, storage |
-| **Browser / device compatibility** | Cross-browser, mobile, extensions |
-| **Page display** | Rendering, download time, dead links, fonts/plugins |
-| **Content** | No misleading/offensive material, licensed images, personalization |
-| **Availability** | Uptime, resistance to DoS |
-| **Backup & recovery** | Failover, backup-failure handling, fault tolerance |
-| **Transactions** | Integrity, throughput, auditing, payment-gateway failure handling |
-| **Order processing** | Cart → order → payment → fulfilment → tracking → returns/refunds |
-| **Internationalization** | Languages, currencies, tax/accounting rules, cultural fit |
-| **Performance** | Peak sales events, inventory consistency under concurrent purchases |
-
-### 5.4 Healthcare Domain
-
-**Objective:** reliability, quality, **patient safety**, performance and regulatory compliance; a defect can endanger life.
-
-- **Stakeholders:** patient/consumer, hospital/provider, insurance company (payer), solution vendors, regulators.
-- **Standards/regulation:** **HIPAA** (US health data privacy), **HL7 / FHIR** (health data exchange), **DICOM** (medical imaging), **ICD-10 / CPT** (diagnosis/procedure codes), **CMS-1500** (formerly HCFA-1500, standard claim form), **OASIS** (home-health assessment data set), **IEC 62304** (medical device software life cycle), FDA/CDSCO for medical device software.
-
+**Process flow:**
 ```mermaid
 flowchart LR
-    A["Patient registration"] --> B["Scheduling"] --> C["Treatment"] --> D["Billing & claims"]
+    A[Patient Registration] --> B[Scheduling]
+    B --> C[Treatment]
+    C --> D[Billing]
 ```
 
 | Sub-system | Testing focus |
 |---|---|
-| **Provider system** | Doctor/hospital records, login and role-based access, invalid credentials, claim status |
-| **Broker / agent system** | Agent details, agency–agent relationships, cashless vs reimbursement flows |
-| **Patient system** | Registration, edit/view records, premium billing and payment, dependents |
-| **Claim system** | Claim routing (cashless/reimbursement), validation of diagnosis/procedure codes, scheme rules |
+| **Provider System** | Add/update doctor-hospital info, login (incl. invalid credentials), claim status |
+| **Broker System (Insurance agent)** | Add/update broker info, agency-agent relationships, cashless vs. cash-return service flows |
+| **Patient System** | Add/edit/view patient, premium billing & payments, registration, dependent/family info |
+| **Claim System** | Claim type routing (cashless/cash-return), claim handling under specific schemes, validation of procedure/diagnostic codes |
 
-**Cross-cutting:** data privacy and audit logs, interoperability between systems (HL7/FHIR), data integrity (no wrong-patient mix-ups), high availability, safety-critical alarms and calculations (dosage), usability for clinical staff.
+### 5. Insurance Domain Testing
+*(Corrected — insurance is distinct from healthcare, even though the two overlap where health insurance is concerned.)*
 
-### 5.5 Insurance Domain
+**Objective:** ensure the policy administration system correctly and compliantly handles the full insurance value chain, since even a small calculation defect here has direct financial/legal consequences for both insurer and policyholder.
 
-**Objective:** ensure the policy administration system handles the full value chain correctly and compliantly; a calculation defect has direct financial and legal consequences.
-
-| Focus | Validated |
+| Testing focus | What is validated |
 |---|---|
-| **Policy issuance** | New policy creation, eligibility, document generation |
-| **Premium calculation** | Risk factors (age, cover, term), taxes, rounding, riders |
-| **Underwriting** | Risk-assessment rules before approval |
-| **Claims processing** | Intake, validation against policy terms, fraud checks, approve/reject, payout |
-| **Renewal, grace period and lapse** | Due dates, grace rules, reinstatement |
-| **Regulatory compliance** | Statutory report formats; regulator rules (IRDAI in India) |
-| **Agent/broker management** | Commission calculation, agent–policy mapping |
+| **Policy Issuance** | New policy creation, applicant eligibility rules, document generation |
+| **Premium Calculation** | Correct premium computed from risk factors (age, coverage amount, term), rounding/tax rules |
+| **Underwriting** | Risk assessment logic applied correctly before a policy is approved |
+| **Claims Processing** | Claim intake, validation against policy terms, approval/rejection logic, payout calculation |
+| **Renewal & Lapses** | Correct handling of due dates, grace periods, lapse/reinstatement rules |
+| **Regulatory Compliance** | Output matches statutory reporting formats (region-specific insurance regulator requirements) |
+| **Agent/Broker Management** | Commission calculation, agent-policy linkage |
 
-### 5.6 Telecom Domain
+### 6. Telecom Domain Testing
+*(Added — listed in the unit outline but not detailed in the source slides; standard content below.)*
 
-**Objective:** validate subscriber provisioning, call/data routing and billing at very large transaction volumes and high availability.
+**Objective:** validate the reliability and correctness of systems handling subscriber provisioning, call/data routing, and billing at very large transaction volumes.
 
-| Focus | Validated |
+| Testing focus | What is validated |
 |---|---|
-| **Provisioning / activation** | SIM/number allocation, plan assignment, number portability |
-| **Call and session setup** | Call establishment, routing, handover between cells, drop rate, VoLTE/IMS |
-| **Billing and rating/charging** | Charge computation per plan (voice/data/SMS); real-time prepaid deduction; CDR (Call Detail Record) accuracy; invoice generation |
-| **Network performance** | Latency, throughput, congestion at peak load, QoS |
-| **Interoperability / roaming** | Cross-operator flows; protocols (SS7, Diameter, SIP/IMS) |
-| **Value-added services (VAS)** | Caller tunes, SMS packs, data top-ups integrated with billing |
-| **OSS/BSS integration** | Operations/business support systems: CRM, mediation, order management |
-
-### 5.7 Domain Testing Template
-For any new domain, answer: (1) Who are the stakeholders? (2) What are the critical workflows and business rules? (3) Which **regulations/standards** apply? (4) What are the highest **risks** (safety, money, privacy)? (5) What non-functional qualities dominate (performance, security, availability)? (6) Which **integrations** exist? Then derive tests using Unit IV techniques.
-
-### Exam Focus: Unit V
-- Web testing areas with an example for each.
-- Why domain knowledge matters; banking-specific test concerns (ACID, security, concurrency).
-- Compare healthcare and insurance testing.
-- E-commerce test types (order processing, session, internationalization).
-- Telecom billing/rating testing.
+| **Provisioning** | New subscriber activation, SIM/number allocation, plan assignment |
+| **Call/Session Setup** | Call establishment, routing, handover between towers, drop-rate |
+| **Billing & Rating** | Correct charge computation per plan/usage (voice/data/SMS), invoice generation, prepaid balance deduction in real time |
+| **Network Performance** | Latency, throughput, congestion handling at peak load |
+| **Interoperability** | Cross-operator (roaming) call/data handling, protocol compliance (e.g., SS7, IMS) |
+| **Value-Added Services (VAS)** | Caller tune, SMS packs, data top-ups working correctly with billing |
 
 ---
 
-## Quick Revision Sheet
+## Quick Revision — Short Notes
 
 **Unit I**
-- Testing = static + dynamic evaluation to find defects and check fitness for purpose; debugging = finding and fixing the cause.
-- Verification (build it right, static) vs validation (build the right thing, dynamic).
-- Error → defect → failure. Severity = technical impact; priority = business urgency.
-- 7 principles: presence not absence · exhaustive impossible · early testing · clustering (80/20) · pesticide paradox · context-dependent · absence-of-errors fallacy.
-- STLC: requirement analysis → planning → case development → environment setup → execution → closure.
-- Bug life cycle: New → Assigned → Open → Fixed → Retest → Verified → Closed (side exits: Reopened, Rejected, Duplicate, Deferred).
-- Metrics: coverage, pass rate, defect density, DRE, leakage.
+- Testing = systematic execution of software to find defects & verify requirement compliance.
+- SDLC models: Waterfall (sequential, rigid), Prototype (early UI feedback), Incremental (phased delivery), Agile (continuous, sprint-based), OOSDLC (object-centric).
+- Verification = building it right (static); Validation = building the right thing (dynamic).
+- 7 Testing Principles: defects shown not absence; exhaustive testing impossible; early testing saves cost; defect clustering (80/20); pesticide paradox; context-dependent; absence-of-errors fallacy.
+- STLC 6 phases: Requirement Analysis → Test Planning → Test Case Development → Environment Setup → Test Execution → Test Cycle Closure.
+- Defect terminology: Error (human mistake) → Defect/Bug (flaw in code) → Failure (observed deviation).
+- Defect types: Requirement, Design, Coding, Testing defects.
+- Bug life cycle: New → Assigned → Active → Test → Verified → Closed (branches: Reopened, Rejected, Deferred).
 
 **Unit II**
-- Classify along axes: approach, knowledge, level, objective.
-- V-model: unit ↔ LLD, integration ↔ HLD, system ↔ SRS, acceptance ↔ BRS/user needs.
-- Integration: top-down (stubs), bottom-up (drivers), big-bang, sandwich.
-- Non-functional: performance (load, stress, spike, soak), usability, compatibility, security, reliability.
-- Regression (did we break anything?) vs re-testing (is the fix good?); smoke (is the build testable?) vs sanity (is the fix sensible?).
-- Automate repetitive, stable, data-heavy tests; keep exploratory/usability manual.
+- Manual (human, no tool) vs Automation (scripted, tool-driven, best for repetitive regression).
+- White-box = internal code logic; Black-box = external behaviour only; Gray-box = partial internal knowledge.
+- Functional levels: Unit → Integration (top-down/bottom-up/big-bang/sandwich) → System → Acceptance (Alpha/Beta/UAT).
+- Non-functional: Performance (Load/Stress/Spike/Soak), Usability, Compatibility.
+- Regression testing = re-run passed tests after a change to confirm nothing broke; strategies: retest-all, selective, prioritized.
+- Automation tools: Selenium (open-source browser automation), Ranorex, Kobiton (mobile), LambdaTest (cross-browser cloud), Avo Assure/testRigor/Subject7 (no-code).
 
 **Unit III**
-- Test case fields: ID, description, pre-condition, steps, data, expected, actual, status, post-condition.
-- Policy → strategy → plan is a scope hierarchy; RTM proves coverage and supports impact analysis.
-- BRS (business need) · SRS (technical requirements) · FDD (how it works).
-- Test data: valid, boundary, invalid; mask production data.
-- TCMT: Jira, TestRail, Zephyr, ALM.
+- Test case fields: ID, description, pre-condition, steps, test data, expected result, actual result, status, post-condition.
+- Documents: Test Policy > Test Strategy > Test Plan > RTM > Defect Report > Test Case.
+- SRS = technical spec; BRS = business requirement; FDD = functional operational description.
+- RTM maps Business Requirement → Functional Requirement → Priority → Test Case, proving coverage.
+- Test data types: Valid, Boundary/Extreme, Invalid/Erroneous.
+- TCMT tools: Jira, Zephyr, TestRail, Quality Center.
 
 **Unit IV**
-- Static (no execution): reviews (informal < walkthrough < technical < inspection) + static analysis.
-- White-box coverage: statement < branch < condition/decision < MC/DC < multiple-condition < path; V(G) = decisions + 1.
-- **BVA:** min−1, min, min+1, max−1, max, max+1. **EP:** one value per valid/invalid partition.
-- **Decision table:** one test per rule (2ⁿ combinations). **State transition:** valid + invalid transitions. **Use case:** main + alternate flows.
-- Experience-based: error guessing, exploratory, checklist.
-- Agile: TDD (red-green-refactor), BDD (Given/When/Then), pyramid (many unit, few UI), CI/CD.
-- Risk = likelihood × impact.
+- Static testing = no execution (Reviews: informal/walkthrough/technical/inspection; Static Analysis: control-flow/data-flow).
+- Dynamic testing = execution-based (Structure-based/white-box coverage metrics; Specification-based/black-box techniques; Experience-based: error guessing, exploratory).
+- **BVA** — test at min−1, min, min+1, max−1, max, max+1 (defects cluster at edges).
+- **EP** — pick one representative value per valid/invalid input class.
+- **Decision Table** — one test case per combination of business-rule conditions.
+- **State Transition** — test valid + invalid transitions between system states (history-dependent behaviour).
+- **Use Case Testing** — derive tests from main + alternate/exception flows of an actor-system interaction.
+- Agile: TDD (test before code), BDD (Given/When/Then), Testing Pyramid (many unit, fewer integration, few E2E).
 
 **Unit V**
-- Web: functionality, usability, interface, database, compatibility, performance, security (OWASP).
-- Banking: functionality + performance + security; ACID, PCI DSS, batch/EOD, reconciliation.
-- E-commerce: cart → order → payment → tracking; session, availability, internationalization.
-- Healthcare: safety-critical; HIPAA, HL7/FHIR, DICOM, ICD-10; provider, broker, patient, claim systems.
-- Insurance: issuance, premium, underwriting, claims, renewal/lapse, compliance.
-- Telecom: provisioning, call setup, rating/billing, network performance, interoperability, VAS.
+- Web: functionality, usability, interface, database, compatibility, performance, security testing across browsers.
+- Banking: Functionality + Performance + Security pillars; high concurrency, multi-platform, multi-currency needs.
+- E-commerce: functionality, usability, security, session mgmt, browser compatibility, page display, content, availability, backup/recovery, transactions, order processing, internationalization.
+- Healthcare: safety-critical; stakeholders = Patient, Hospital, Insurer, Regulator (HIPAA/OASIS/HCFA-1500); flow = Registration → Scheduling → Treatment → Billing; sub-systems = Provider, Broker, Patient, Claim.
+- Insurance: Policy issuance, Premium calculation, Underwriting, Claims processing, Renewal/lapse, Regulatory compliance.
+- Telecom: Provisioning, Call/session setup, Billing/rating, Network performance, Interoperability, VAS.
 
 ---
 
-## Master Comparison Table
-
-| Pair | Key difference |
-|---|---|
-| Error vs defect vs failure | Human mistake vs flaw in artifact vs observed wrong behaviour |
-| Verification vs validation | Right product built right (static) vs right product (dynamic) |
-| QA vs QC | Process/prevention vs product/detection |
-| Testing vs debugging | Expose failure vs find and fix cause |
-| Severity vs priority | Impact on system vs urgency of fix |
-| Static vs dynamic testing | No execution vs execution |
-| White vs black vs gray box | Code-based vs behaviour-based vs partial knowledge |
-| Stub vs driver | Replaces called module vs replaces calling module |
-| Alpha vs beta | Internal, pre-release vs real users, external |
-| Smoke vs sanity | Broad build-stability check vs narrow change check |
-| Regression vs confirmation | Nothing else broke vs the fix works |
-| Load vs stress vs soak | Expected load vs beyond capacity vs long duration |
-| Test scenario vs test case | High-level situation vs detailed steps, data, expected result |
-| Test strategy vs test plan | General approach vs project-specific plan |
-| BRS vs SRS vs FDD | Business need vs technical requirement vs operational design |
-| EP vs BVA | One value per class vs values at class edges |
-| Walkthrough vs inspection | Author-led, informal vs formal roles, checklists, metrics |
-| TDD vs BDD | Developer unit tests first vs shared business-readable scenarios |
-| Statement vs branch coverage | Every line runs vs every decision outcome taken |
-
----
-
-*Cross-check formulas, tool names and definitions against your syllabus and university question bank before the exam; institutional wording can differ slightly from ISTQB phrasing.*
+*Prepared as a study reference — cross-check numeric formulas, tool names, and clause definitions against your syllabus/university question bank before the exam, as institution-specific phrasing can vary slightly from the ISTQB terminology used here to sharpen the concepts.*
