@@ -11,6 +11,7 @@
 Study in this order. Each unit builds on the one before it.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     U1["Unit I<br/>Fundamentals<br/>(what, why, STLC, defects)"] --> U2["Unit II<br/>Types of Testing<br/>(levels, white/black box, automation)"]
     U2 --> U3["Unit III<br/>Test Case Development<br/>(test case, RTM, test data)"]
@@ -49,6 +50,7 @@ Testing begins with understanding the **system** being tested.
 **Example: Hospital Management System (module structure / functional decomposition)**
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart TD
     HMS["Hospital Management System"] --> IPD["IPD (In-Patient)"]
     HMS --> OPD["OPD (Out-Patient)"]
@@ -91,6 +93,7 @@ flowchart TD
 4. Identifies limitations of available resources.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     P["Planning"] --> AN["Analysis"] --> D["Design"] --> C["Coding"] --> T["Testing"] --> DP["Deployment"] --> M["Maintenance"]
     M -.->|"change request"| AN
@@ -116,6 +119,7 @@ flowchart LR
 - All activities are planned and scheduled **before** work starts.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart TD
     R["Requirements"] --> D["Design"] --> I["Implementation (Coding)"] --> T["Testing"] --> DP["Deployment"] --> M["Maintenance"]
 ```
@@ -131,6 +135,7 @@ flowchart TD
 - Developer builds a **working model (prototype)**, the customer evaluates it, and it is **refined until accepted**.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     RG["Gather requirements"] --> QD["Quick design"] --> BP["Build prototype"] --> CE{"Customer satisfied?"}
     CE -- "No: refine" --> QD
@@ -148,6 +153,7 @@ flowchart LR
 - Each increment goes through: planning → analysis → modelling → construction → deployment.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     subgraph I1["Increment 1: core features"]
         A1["Analyse"] --> B1["Design"] --> C1["Code and test"]
@@ -169,6 +175,7 @@ flowchart LR
 - **Risk-driven**, iterative. Each loop of the spiral has four activities: **Planning → Risk analysis → Engineering → Evaluation**.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     PL["1. Planning"] --> RA["2. Risk analysis"] --> EN["3. Engineering (build and test)"] --> EV["4. Customer evaluation"]
     EV -->|"next loop"| PL
@@ -199,6 +206,7 @@ flowchart LR
 ### Error, Defect, Failure
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     ER["Error<br/>(human mistake)"] --> DF["Defect / Bug / Fault<br/>(flaw in code or document)"] --> FL["Failure<br/>(wrong behaviour when run)"]
 ```
@@ -299,6 +307,7 @@ flowchart LR
 **Definition:** STLC is a **systematic, planned and sequential** testing process (6 phases) used to improve software quality.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     RA["1. Requirement Analysis"] --> TP["2. Test Planning"] --> TC["3. Test Case Development"] --> ES["4. Environment Setup"] --> TE["5. Test Execution"] --> CL["6. Test Cycle Closure"]
 ```
@@ -323,6 +332,7 @@ flowchart LR
 ### Types of Defects
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     DEF["Defects"] --> RS["1. Requirement and Specification"]
     DEF --> DS["2. Design"]
@@ -353,6 +363,7 @@ flowchart LR
 **Definition:** A method of **identifying, recording, tracking and resolving defects**. Its purpose is to give information that **improves the development process** and makes software more effective and efficient.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     D["Discovery<br/>(tester finds defect)"] --> RP["Reporting<br/>(report sent to dev/management)"] --> CT["Categorization<br/>(Critical / High / Medium / Low)"] --> RS["Resolution<br/>(assigned, fixed, schedule)"] --> VR["Verification<br/>(tester retests the fix)"] --> CL["Closure<br/>(status = Closed)"]
 ```
@@ -408,6 +419,7 @@ stateDiagram-v2
 Testing is a **continuous activity** during development. It is used to **verify** (build it right) and **validate** (build the right thing).
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart TD
     T["Software Testing"] --> M["Manual Testing"]
     T --> A["Automation Testing"]
@@ -479,6 +491,7 @@ flowchart TD
 ## 2.3 Levels of Testing
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     U["Unit Testing<br/>(single module)"] --> I["Integration Testing<br/>(modules together)"] --> S["System Testing<br/>(whole system)"] --> AC["Acceptance Testing<br/>(by customer)"]
 ```
@@ -486,6 +499,7 @@ flowchart LR
 ### V-Model: Development phase mapped to Testing level
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart TD
     subgraph DEV["Development (Verification)"]
         R["Requirement Analysis"] --> H["High-Level Design"] --> L["Low-Level Design"] --> C["Coding"]
@@ -519,6 +533,7 @@ flowchart TD
 - Approaches: **Top-down** and **Bottom-up** (also Big-bang and Sandwich (+)).
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart TD
     M1["Module 1 (top)"] --> M2["Module 2"]
     M1 --> M3["Module 3"]
@@ -588,6 +603,7 @@ flowchart TD
 - **Example:** Testing a web page while knowing the database table structure.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     subgraph WB["White Box"]
         W1["Tester SEES code"] --> W2["Tests paths, branches, statements"]
@@ -660,6 +676,7 @@ flowchart LR
 6. Configuration changed.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     CH["Code change<br/>(fix / new feature)"] --> SEL["Select impacted<br/>test cases"] --> RUN["Re-execute tests"] --> CMP{"Old features<br/>still pass?"}
     CMP -- "Yes" --> OK["Release"]
@@ -693,6 +710,7 @@ flowchart LR
 ### Types of Test Documents
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart TD
     TPOL["Test Policy<br/>(organisation-level principles and goals)"] --> TSTR["Test Strategy<br/>(which test levels, approach)"]
     TSTR --> TPLN["Test Plan<br/>(scope, schedule, resources) (+)"]
@@ -746,6 +764,7 @@ flowchart TD
 ### How to Write a Test Case (step-by-step)
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     S1["Step 1<br/>Write ID and description"] --> S2["Step 2<br/>Decide test data"] --> S3["Step 3<br/>Write test steps"] --> S4["Step 4<br/>Write expected result"] --> S5["Step 5<br/>Add pre/post-conditions"] --> S6["Step 6<br/>Execute: record actual result, Pass/Fail"]
 ```
@@ -806,6 +825,7 @@ flowchart LR
 | **FDD** | Functional Design Document | How a **process or system works**; no deep technical details; explains how people interact; shared with stakeholders for review and sign-off; time-consuming to maintain |
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     BRS["BRS<br/>(what the business wants)"] --> SRS["SRS<br/>(what the software must do)"] --> FDD["FDD<br/>(how it functions)"] --> TA["Test Analysis"] --> TC["Test Conditions and Test Cases"]
 ```
@@ -822,6 +842,7 @@ flowchart LR
 3. **Fill in the matrix** (in Microsoft Excel or any tool).
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     BR["Business Requirement"] --> FR["Functional Requirement"] --> TC["Test Case"] --> EX["Execution Result"] --> DF["Defect"]
 ```
@@ -855,6 +876,7 @@ flowchart LR
 **Definition:** The data collected and managed from various sources to **execute test cases**.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart TD
     TD["Test Data"] --> V["Valid Data<br/>(program should accept and process)"]
     TD --> I["Invalid / Erroneous Data<br/>(program cannot process, must reject)"]
@@ -906,6 +928,7 @@ flowchart TD
 ## 4.2 Classification of Techniques
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart TD
     ST["Software Testing Techniques"] --> STA["Static Testing<br/>(code NOT executed)"]
     ST --> DYN["Dynamic Testing<br/>(code IS executed)"]
@@ -1026,6 +1049,7 @@ Used when **specifications are poor or time is short**, and to complement formal
 **Example: Exam marks (0 to 100)**
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     I1["Invalid<br/>less than 0"] --- V1["Fail<br/>0 to 39"] --- V2["Pass<br/>40 to 59"] --- V3["Merit<br/>60 to 74"] --- V4["Distinction<br/>75 to 100"] --- I2["Invalid<br/>more than 100"]
 ```
@@ -1057,6 +1081,7 @@ For **n variables**: standard BVA = **4n + 1** tests; robust BVA = **6n + 1** te
 **Example: Age field accepts 18 to 60**
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     A["17<br/>invalid"] --- B["18<br/>MIN valid"] --- C["19"] --- D["39<br/>nominal"] --- E["59"] --- F["60<br/>MAX valid"] --- G["61<br/>invalid"]
 ```
@@ -1140,6 +1165,7 @@ stateDiagram-v2
 **Example: ATM cash withdrawal**
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart TD
     A["Actor inserts card and enters PIN"] --> B{"PIN valid?"}
     B -- "No (alternate flow)" --> X1["Show error; retry or block card"]
@@ -1189,6 +1215,7 @@ flowchart TD
 - Test on multiple browsers: Chrome, Safari, Edge, Firefox, Opera. Excel is commonly used for test-case design.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart TD
     WT["Web Application Testing"] --> FN["Functionality"]
     WT --> US["Usability"]
@@ -1212,6 +1239,7 @@ flowchart TD
 | **Crowd testing** | Performed by a **large group of people** (testers across the world) | |
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     B["Browser (client)"] -->|"HTTP request"| W["Web Server"] --> AP["Application Server"] --> D[("Database Server")]
     D --> AP --> W -->|"response"| B
@@ -1283,6 +1311,7 @@ sequenceDiagram
 **Objectives:** software reliability, software quality, system assurance, optimum performance.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     BR["Browse / search catalogue"] --> CT["Add to cart"] --> CK["Checkout"] --> PY["Payment"] --> OR["Order confirmation"] --> TR["Order tracking"] --> DL["Delivery / returns"]
 ```
@@ -1316,6 +1345,7 @@ flowchart LR
 **Standards and forms:** **HIPAA** (privacy and security of health data), **OASIS** (home-health assessment data set), **HCFA-1500 / CMS-1500** (claim form).
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     PR["Patient registration"] --> SC["Scheduling<br/>(appointment)"] --> TR["Treatment"] --> BL["Billing and claims"]
 ```
@@ -1338,6 +1368,7 @@ flowchart LR
 **Definition:** Testing applications that manage **policies, premiums and claims**.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     NB["New business<br/>(proposal)"] --> UW["Underwriting<br/>(risk assessment)"] --> PL["Policy issue"] --> PM["Premium collection"] --> CL["Claim processing"] --> RN["Renewal / lapse"]
 ```
@@ -1407,6 +1438,7 @@ flowchart LR
 | Responding to change | Following a plan |
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     PL["Plan"] --> RQ["Requirements"] --> DS["Design"] --> CD["Code"] --> TS["Test"] --> DM["Demo to client"]
     DM -->|"feedback, next iteration"| PL
@@ -1443,6 +1475,7 @@ flowchart LR
 | **Scrum Team** | Self-organised; plans and completes the **sprint** work |
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     PB["Product Backlog<br/>(prioritised features)"] --> SP["Sprint Planning<br/>Meeting"] --> SB["Sprint Backlog"] --> SPR["Sprint (1-4 weeks)<br/>with Daily Stand-up"] --> FW["Finished Work<br/>(potentially shippable)"]
     SPR --> RV["Sprint Review<br/>(demo to stakeholders)"] --> RT["Sprint Retrospective<br/>(what to improve)"]
@@ -1479,6 +1512,7 @@ flowchart LR
 ### Agile Test Strategy
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     RP["Release Planning<br/>(test plan)"] --> SQ["Each Sprint<br/>(QA activities)"] --> HS["Hardening Sprint<br/>(system test, end game)"] --> RQ["Release<br/>(exit criteria, retrospective)"]
 ```
@@ -1504,6 +1538,7 @@ flowchart LR
 ### Red-Green-Refactor cycle
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     R["RED<br/>Write a small failing test"] --> G["GREEN<br/>Write just enough code to pass"] --> RF["REFACTOR<br/>Remove duplication, clean the code"]
     RF --> R
@@ -1556,6 +1591,7 @@ flowchart LR
 **Given-When-Then format:**
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     G["GIVEN<br/>initial context"] --> W["WHEN<br/>an action happens"] --> T["THEN<br/>expected outcome"]
 ```
@@ -1582,6 +1618,7 @@ Feature: User login
 **Definition:** ATDD is a collaborative practice where **customers, developers and testers define acceptance tests before development begins**. Tests are **not unit tests**; they express business expectations.
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}}}%%
 flowchart LR
     DI["DISCUSS<br/>Team clarifies the story<br/>and writes concrete examples"] --> DE["DEVELOP<br/>Automate acceptance tests;<br/>build code using TDD"] --> DL["DELIVER<br/>Feature released;<br/>acceptance tests pass"]
     DL -->|"next story"| DI
